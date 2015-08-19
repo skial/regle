@@ -1,0 +1,4 @@
+-lib yaml
+-cp src
+-neko bin/regle.n
+-main Main
