@@ -129,6 +129,12 @@ class Hashids {
 		return _encode(args);
 	}
 	
+	public function decode(hash:String):Array<Int> {
+		if (hash.length == 0) return [];
+		
+		return _decode(hash, alphabet);
+	}
+	
 	private function _encode(numbers:Array<Int>):String {
 		var alphabet = this.alphabet;
 		var numbersHashInt = 0;
@@ -180,6 +186,41 @@ class Hashids {
 		}
 		
 		return result;
+	}
+	
+	private function _decode(hash:String, alphabet:String):Array<Int> {
+		var results = [];
+		
+		var i = 0;
+		var r = new EReg('[$guards]', 'g');
+		var hashBreakdown = r.replace(hash, ' ');
+		var hashArray = hashBreakdown.split(' ');
+		
+		if (hashArray.length == 3 || hashArray.length == 2) i = 1;
+		
+		hashBreakdown = hashArray[i];
+		if (hashBreakdown.charAt(0) != null) {
+			var lottery = hashBreakdown.charAt(0);
+			hashBreakdown = hashBreakdown.substr(1);
+			
+			r = new EReg('[$separators]', 'g');
+			hashBreakdown = r.replace(hashBreakdown, ' ');
+			hashArray = hashBreakdown.split(' ' );
+			
+			for (i in 0...hashArray.length) {
+				var subhash = hashArray[i];
+				var buffer = lottery + salt + alphabet;
+				
+				alphabet = consistentShuffle( alphabet, buffer.substr(0, alphabet.length));
+				results.push( unhash( subhash, alphabet ) );
+			}
+			
+			if (_encode(results) != hash) {
+				results = [];
+			}
+		}
+		
+		return results;
 	}
 	
 	private function hash(input:Int, alphabet:String):String {
