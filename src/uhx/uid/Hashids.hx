@@ -4,6 +4,8 @@ import yaml.util.Ints;
 /**
  * ...
  * @author Skial Bainn
+ * Port of the JavaScript version of Hashids
+ * @see http://hashids.org/
  */
 class Hashids {
 	
