@@ -12,7 +12,7 @@ class Hashids {
 	private var separators:String = 'cfhistuCFHISTU';
 	
 	private var minAlphabetLength:Int = 16;
-	private var sepDiv:Float = 3.5;
+	private var separatorDiv:Float = 3.5;
 	private var guardDiv:Int = 12;
 	
 	private var guards:String = '';
@@ -22,15 +22,11 @@ class Hashids {
 		if (salt != null) this.salt = salt;
 		if (alphabet != null) this.alphabet = alphabet;
 		
-		var guardCount = 0;
-		var diff = 0;
-		var sepLength = 0;
-		var uniqueAlphabet = '';
-		for (i in 0...this.alphabet.length) {
-			if (uniqueAlphabet.indexOf( this.alphabet.charAt( i ) ) == -1) {
-				uniqueAlphabet += this.alphabet.charAt( i );
-				
-			}
+		var diff = 0, sepLength = 0, guardCount = 0, uniqueAlphabet = '';
+		
+		for (i in 0...this.alphabet.length) if (uniqueAlphabet.indexOf( this.alphabet.charAt( i ) ) == -1) {
+			uniqueAlphabet += this.alphabet.charAt( i );
+			
 		}
 		
 		this.alphabet = uniqueAlphabet;
@@ -40,61 +36,62 @@ class Hashids {
 			throw 'error: alphabet must contain at least $minAlphabetLength unique characters';
 		}
 		
-		if (this.alphabet.indexOf(' ') > -1) {
-			throw 'error: alphabet cannot contain spaces';
-		}
+		if (this.alphabet.indexOf(' ') > -1) throw 'error: alphabet cannot contain spaces';
 		
 		for (i in 0...this.separators.length) {
-			var j = this.alphabet.indexOf( this.separators.charAt( i ) );
+			var j = this.alphabet.indexOf( separators.charAt( i ) );
+			
 			if (j == -1) {
-				this.separators = this.separators.substring(0, i) + ' ' + this.separators.substring(i + 1);
+				separators = separators.substring(0, i) + ' ' + separators.substring(i + 1);
+				
 			} else {
 				this.alphabet = this.alphabet.substring(0, j) + ' ' + this.alphabet.substring(j + 1);
+				
 			}
 			
 		}
 		
 		this.alphabet = ~/ /g.replace(this.alphabet, '');
-		this.separators = ~/ /g.replace(this.separators, '');
+		separators = ~/ /g.replace( separators, '' );
+		separators = consistentShuffle( separators, this.salt );
 		
-		this.separators = consistentShuffle(this.separators, this.salt);
-		
-		if (separators.length > 0 || (this.alphabet.length / this.separators.length) > this.sepDiv) {
-			sepLength = Math.ceil(this.alphabet.length / this.sepDiv);
+		if (separators.length > 0 || (this.alphabet.length / separators.length) > separatorDiv) {
+			sepLength = Math.ceil(this.alphabet.length / separatorDiv);
 			
 			if (sepLength == 1) sepLength++;
-			if (sepLength > this.separators.length) {
-				diff = sepLength - this.separators.length;
-				this.separators += this.alphabet.substr(0, diff);
+			if (sepLength > separators.length) {
+				diff = sepLength - separators.length;
+				separators += this.alphabet.substr(0, diff);
 				this.alphabet = this.alphabet.substr(diff);
+				
 			} else {
-				this.separators = this.separators.substr(0, sepLength);
+				separators = separators.substr(0, sepLength);
+				
 			}
 			
 		}
 		
-		this.alphabet = consistentShuffle(this.alphabet, this.salt);
+		this.alphabet = consistentShuffle( this.alphabet, this.salt );
 		
-		guardCount = Math.ceil(this.alphabet.length / this.guardDiv);
+		guardCount = Math.ceil( this.alphabet.length / guardDiv );
 		
 		if (this.alphabet.length < 3) {
-			this.guards = this.separators.substr(0, guardCount);
-			this.separators = this.separators.substr(guardCount);
+			this.guards = separators.substr(0, guardCount);
+			separators = separators.substr(guardCount);
+			
 		} else {
 			this.guards = this.alphabet.substr(0, guardCount);
 			this.alphabet = this.alphabet.substr(guardCount);
+			
 		}
 	}
 	
 	public function consistentShuffle(alphabet:String, ?salt:String):String {
 		if (salt == null) return alphabet;
 		
-		var integer:Int = 0;
-		var temp:String = '';
 		var i:Int = alphabet.length - 1;
-		var v:Int = 0;
-		var p:Int = 0;
-		var j:Int = 0;
+		var v:Int = 0, p:Int = 0, j:Int = 0;
+		var integer:Int = 0, temp:String = '';
 		
 		while (i > 0) {
 			v %= salt.length;
@@ -113,10 +110,8 @@ class Hashids {
 	}
 	
 	public function encode(args:Array<Int>):String {
-		var result = '';
-		var i = 0;
-		var length = 0;
 		var numbers = args.length;
+		var result = '', i = 0, length = 0;
 		
 		if (args.length == 0) return result;
 		
@@ -136,37 +131,35 @@ class Hashids {
 	}
 	
 	private function _encode(numbers:Array<Int>):String {
-		var alphabet = this.alphabet;
-		var numbersHashInt = 0;
-		var numbersSize = numbers.length;
+		var numbersHashInt = 0, numbersSize = numbers.length;
 		
 		for (i in 0...numbers.length) numbersHashInt += (numbers[i] % (i + 100));
 		
-		var result = '';
+		var result = '', alphabet = this.alphabet;
 		var lottery = result = alphabet.charAt( numbersHashInt % alphabet.length );
 		
 		for (i in 0...numbers.length) {
 			var number = numbers[i];
-			var buffer = lottery + this.salt + alphabet;
-			alphabet = consistentShuffle(alphabet, buffer.substr(0, alphabet.length) );
+			var buffer = '$lottery$salt$alphabet';
+			alphabet = consistentShuffle( alphabet, buffer.substr(0, alphabet.length ) );
 			var last = this.hash(number, alphabet);
 			
 			result += last;
 			
 			if (i + 1 < numbersSize) {
 				number %= (last.charCodeAt(0) + i);
-				var sepsIndex = number % this.separators.length;
-				result += this.separators.charAt(sepsIndex);
+				var sepsIndex = number % separators.length;
+				result += separators.charAt(sepsIndex);
 			}
 		}
 		
-		if (result.length < this.minHashLength) {
+		if (result.length < minHashLength) {
 			var guardIndex = (numbersHashInt + result.charCodeAt(0)) % this.guards.length;
 			var guard = this.guards.charAt(guardIndex);
 			
 			result = guard + result;
 			
-			if (result.length < this.minHashLength) {
+			if (result.length < minHashLength) {
 				guardIndex = (numbersHashInt + result.charCodeAt(2)) % this.guards.length;
 				guard = this.guards.charAt(guardIndex);
 				
@@ -175,30 +168,30 @@ class Hashids {
 		}
 		
 		var halfLength = Ints.parseInt('' + (alphabet.length / 2), 10);
-		while (result.length < this.minHashLength) {
-			alphabet = this.consistentShuffle(alphabet, alphabet);
+		
+		while (result.length < minHashLength) {
+			alphabet = consistentShuffle( alphabet, alphabet );
 			result = alphabet.substr(halfLength) + result + alphabet.substr(0, halfLength);
 			
-			var excess = result.length - this.minHashLength;
+			var excess = result.length - minHashLength;
+			
 			if (excess > 0) {
-				result = result.substr(Std.int(excess / 2), this.minHashLength);
+				result = result.substr(Std.int(excess / 2), minHashLength);
 			}
+			
 		}
 		
 		return result;
 	}
 	
 	private function _decode(hash:String, alphabet:String):Array<Int> {
-		var results = [];
-		
-		var i = 0;
-		var r = new EReg('[$guards]', 'g');
-		var hashBreakdown = r.replace(hash, ' ');
-		var hashArray = hashBreakdown.split(' ');
+		var results = [], i = 0, r = new EReg('[$guards]', 'g');
+		var hashBreakdown = r.replace(hash, ' '), hashArray = hashBreakdown.split(' ');
 		
 		if (hashArray.length == 3 || hashArray.length == 2) i = 1;
 		
 		hashBreakdown = hashArray[i];
+		
 		if (hashBreakdown.charAt(0) != null) {
 			var lottery = hashBreakdown.charAt(0);
 			hashBreakdown = hashBreakdown.substr(1);
@@ -215,9 +208,8 @@ class Hashids {
 				results.push( unhash( subhash, alphabet ) );
 			}
 			
-			if (_encode(results) != hash) {
-				results = [];
-			}
+			if (_encode(results) != hash) results = [];
+			
 		}
 		
 		return results;
@@ -225,19 +217,17 @@ class Hashids {
 	
 	private function hash(input:Int, alphabet:String):String {
 		var hash = '';
-		var alphabetLength = alphabet.length;
 		
-		do {
-			hash = alphabet.charAt(input % alphabetLength) + hash;
-			input = Ints.parseInt('' + input / alphabetLength, 10);
-		} while (input != null && input > 0);
+		while (input != null && input > 0) {
+			hash = alphabet.charAt(input % alphabet.length) + hash;
+			input = Ints.parseInt('' + input / alphabet.length, 10);
+		}
 		
 		return hash;
 	}
 	
 	private function unhash(input:String, alphabet:String):Int {
-		var number = 0.0;
-		var pos = 0;
+		var number = 0.0, pos = 0;
 		
 		for (i in 0...input.length) {
 			pos = alphabet.indexOf(input.charAt(i));
