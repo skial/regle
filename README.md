@@ -4,7 +4,7 @@
 
 ## What is it?
 
-Regle is a collection of utilies that generate ids.
+Regle is a collection of utilities that generate ids.
 
 Regle currently contains:
 	
