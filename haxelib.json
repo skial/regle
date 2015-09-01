@@ -1,0 +1,14 @@
+{
+  "name": "regle",
+  "license": "MIT",
+  "classPath": "src",
+  "tags": ["uhu", "uhx", "sys", "regle", "hash", "id", "help"],
+  "description": "A collection of utilies that generate ids.",
+  "contributors": ["skial"],
+  "releasenote": "Initial Release",
+  "version": "0.0.1-alpha",
+  "url": "https://github.com/skial/regle",
+  "dependencies": {
+    "yaml": ""
+  }
+}
