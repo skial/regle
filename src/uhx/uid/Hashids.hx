@@ -1,4 +1,5 @@
 package uhx.uid;
+
 import yaml.util.Ints;
 
 /**
