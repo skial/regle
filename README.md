@@ -18,3 +18,23 @@ You need to install the following libraries from HaxeLib and GitHub.
 2. regle - `haxelib git uri https://github.com/skial/uri master src`
 
 Then in your `.hxml` file, add `-lib regle` and you're set.
+
+## Usage
+
+#### Hashids Usage
+
+```Haxe
+package ;
+
+import uhx.uid.Hashids;
+
+class Main {
+	
+	public static function main() {
+		var hids = new Hashids( 'my salt' );
+		var id = hids.encode( [683, 94108, 123, 5] ); // `id` is now `aBMswoO2UB3Sj`.
+		var values = hids.decode( id ); // `values` is now `[683, 94108, 123, 5]`.
+	}
+	
+}
+```
