@@ -1,4 +1,45 @@
 -lib yaml
+-lib utest
+-lib thx.core
+#-lib jstack
+
 -cp src
--neko bin/regle.n
+-cp tests
+
+-dce full
+
+-debug
+-D analyzer-optimize
+#-D source_map
+
 -main Main
+
+--each
+
+-neko bin/regle.n
+
+--next
+
+-js bin/regle.js
+
+--next
+
+-python bin/regle.py
+
+--next
+
+#-c-arg -Xlint:deprecation
+#-java bin/java
+
+#--next
+
+-cs bin/cs
+
+--next
+
+-D php7
+-php bin/php
+
+--next
+
+--macro Main.main()

@@ -9,6 +9,8 @@
   "version": "0.0.1-alpha",
   "url": "https://github.com/skial/regle",
   "dependencies": {
-    "yaml": ""
+    "yaml": "",
+    "thx.core": "",
+    "utest": ""
   }
 }
