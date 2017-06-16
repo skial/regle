@@ -49,20 +49,13 @@ class Optimus {
     * @see https://github.com/numbers/numbers.js/blob/master/lib/numbers/basic.js#L398
     */
     public static #if !debug inline #end function egcd(a:Int64, b:Int64):Array<Int64> {
-        // Same as isNaN() but faster
         if (a != a || b != b) {
             return [];
         }
 
-        //Same as !isFinite() but faster
         if (a.toInt() == Math.POSITIVE_INFINITY || a.toInt() == Math.NEGATIVE_INFINITY || b.toInt() == Math.POSITIVE_INFINITY || b.toInt() == Math.NEGATIVE_INFINITY) {
             return [];
         }
-
-        // Checks if a or b are decimals
-        /*if ((a % 1 != 0) || (b % 1 != 0)) {
-            throw "Can only operate on Floats.";
-        }*/
 
         var signX:Int64 = (a < 0) ? -1 : 1;
         var signY:Int64 = (b < 0) ? -1 : 1;
@@ -71,8 +64,7 @@ class Optimus {
         var oldX:Int64 = 1;
         var oldY:Int64 = 0;
         var q:Int64 = 0, r:Int64 = 0, m:Int64 = 0, n:Int64 = 0;
-        //a = Math.abs(a);
-        //b = Math.abs(b);
+        
         a = a < 0 ? -a : a;
         b = b < 0 ? -b : b;
 
@@ -136,10 +128,9 @@ class Optimus {
         var tryComposite = function (a) {
             if (powerMod(a, d, n) == 1) return false;
 
-            //for (i in 0...s) {
             var i = 0;
             while (i < s) {
-                if (powerMod(a, Math.pow(2, i).fromFloat() * d, n) == n - 1) return false;
+                if (powerMod(a, power(2, i) * d, n) == n - 1) return false;
                 
                 i++;
             }
@@ -148,7 +139,6 @@ class Optimus {
         };
 
         var i = 0;
-        //for (i in 0...itr) {
         while (i < itr) {
             var a = 2 + Math.floor(Math.random() * (n.toInt() - 2 - 2));
             if (tryComposite(a)) return false;

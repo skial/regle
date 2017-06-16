@@ -8,7 +8,8 @@ Regle is a collection of utilities that generate ids.
 
 Regle currently contains:
 	
-- A [Hashids] port that generates short, unique, non-sequential ids from numbers.
+- An [Hashids] port that generates short, unique, non-sequential ids from numbers.
+- An [Optimus] port that obfuscation ids based on Knuth's multiplicative hashing method.
 
 ## Installation
 
@@ -40,3 +41,4 @@ class Main {
 ```
 
 [Hashids]: http://hashids.org/ "Generate short, unique, non-sequential ids"
+[Optimus]: https://github.com/jenssegers/optimus "Id obfuscation based on Knuth's multiplicative hashing method"
