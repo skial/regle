@@ -3,7 +3,6 @@ package uhx.uid;
 import yaml.util.Ints;
 
 /**
- * ...
  * @author Skial Bainn
  * Port of the JavaScript version of Hashids
  * @see http://hashids.org/
@@ -11,7 +10,7 @@ import yaml.util.Ints;
 class Hashids {
 	
 	private var salt:String = '';
-	private var alphabet:String = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+	private var alphabet:String = '';
 	private var separators:String = 'cfhistuCFHISTU';
 	
 	private var minAlphabetLength:Int = 16;
@@ -21,9 +20,9 @@ class Hashids {
 	private var guards:String = '';
 	private var minHashLength:Int = 0;
 
-	public inline function new(?salt:String, ?minHashLength:Int, ?alphabet:String) {
-		if (salt != null) this.salt = salt;
-		if (alphabet != null) this.alphabet = alphabet;
+	public function new(?salt:String = '', ?minHashLength:Int = 0, ?alphabet:String = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890') {
+		this.salt = salt;
+		this.alphabet = alphabet;
 		
 		var diff = 0, sepLength = 0, guardCount = 0, uniqueAlphabet = '';
 		
@@ -89,16 +88,16 @@ class Hashids {
 		}
 	}
 	
-	public function consistentShuffle(alphabet:String, ?salt:String):String {
-		if (salt == null) return alphabet;
+	public function consistentShuffle(alphabet:String, salt:String):String {
+		if (salt.length == 0) return alphabet;
 		
-		var i:Int = alphabet.length - 1;
-		var v:Int = 0, p:Int = 0, j:Int = 0;
-		var integer:Int = 0, temp:String = '';
+		var i = alphabet.length - 1;
+		var v = 0, p = 0, j = 0;
+		var integer = 0, temp = '';
 		
 		while (i > 0) {
-			v %= salt.length;
-			p += integer = salt.charAt(v).charCodeAt(0);
+			v = v % salt.length;
+			p += (integer = salt.charAt(v).charCodeAt(0));
 			j = (integer + v + p) % i;
 			
 			temp = alphabet.charAt(j);
@@ -221,7 +220,7 @@ class Hashids {
 	private function hash(input:Int, alphabet:String):String {
 		var hash = '';
 		
-		while (input != null && input > 0) {
+		while (input > 0) {
 			hash = alphabet.charAt(input % alphabet.length) + hash;
 			input = Ints.parseInt('' + input / alphabet.length, 10);
 		}
