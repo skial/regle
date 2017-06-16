@@ -9,7 +9,7 @@ Regle is a collection of utilities that generate ids.
 Regle currently contains:
 	
 - An [Hashids] port that generates short, unique, non-sequential ids from numbers.
-- An [Optimus] port that obfuscation ids based on Knuth's multiplicative hashing method.
+- An [Optimus] port that obfuscates ids based on Knuth's multiplicative hashing method.
 
 ## Installation
 
