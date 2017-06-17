@@ -20,9 +20,7 @@ You need to install the following libraries from HaxeLib and GitHub.
 
 Then in your `.hxml` file, add `-lib regle` and you're set.
 
-## Usage
-
-#### Hashids Usage
+## Hashids Usage
 
 ```Haxe
 package ;
@@ -32,11 +30,29 @@ import uhx.uid.Hashids;
 class Main {
 	
 	public static function main() {
-		var hids = new Hashids( 'my salt' );
-		var id = hids.encode( [683, 94108, 123, 5] ); // `id` is now `aBMswoO2UB3Sj`.
-		var values = hids.decode( id ); // `values` is now `[683, 94108, 123, 5]`.
+		var hids = new Hashids();
+		var id = hids.encode( [1, 2, 3] ); // `id` is now `o2fXhV`.
+		var values = hids.decode( id ); // `values` is now `[1, 2, 3]`.
 	}
 	
+}
+```
+
+## Optimus Usage 
+
+```Haxe
+package ;
+
+import uhx.uid.Optimus;
+
+class Main {
+
+	public static function main() {
+		var optimus = new Optimus(1580030173, 59260789, 1163945558);
+		var id = optimus.encode(15); // 1103647397
+		var value = optimus.decode(id); // 15
+	}
+
 }
 ```
 
