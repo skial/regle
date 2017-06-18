@@ -1,7 +1,6 @@
 -lib yaml
 -lib utest
 -lib thx.core
-#-lib jstack
 
 -cp src
 -cp tests
@@ -10,7 +9,6 @@
 
 -debug
 -D analyzer-optimize
-#-D source_map
 
 -main Main
 

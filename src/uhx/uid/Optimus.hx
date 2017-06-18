@@ -35,13 +35,13 @@ class Optimus {
         return (((_v ^ random) * inverse) & MAX_INT).toInt();
     }
 
-    /*public static #if !debug inline #end function generatePrime():Float {
-        return BigFloat.randomBetween(1e7, MAX_INT);
+    /*public static #if !debug inline #end function generatePrime():Int64 {
+        return (1e7, MAX_INT);
     }
 
-    public static #if !debug inline #end function generateInverse(prime:Float):Float {
+    public static #if !debug inline #end function generateInverse(prime:Int64):Int64 {
         return modInverse(prime, MAX_INT + 1);
-    }*/
+    }/*
 
     /*
     * Calculate the extended Euclid Algorithm or extended GCD.

@@ -1,0 +1,5 @@
+-cp src
+-debug
+-lib random
+-D eval-stack
+--macro uhx.uid.util.OptimusGenerator.init()
