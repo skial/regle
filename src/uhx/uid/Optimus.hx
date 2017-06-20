@@ -2,6 +2,7 @@ package uhx.uid;
 
 import haxe.Int64;
 
+using haxe.io.Path;
 using uhx.uid.Optimus;
 using haxe.Int64;
 
@@ -9,13 +10,32 @@ class Optimus {
 
     public static var MAX_INT:Int64 = 2147483647.ofInt();
 
+    public static macro function make() {
+        var path = '${Sys.getCwd()}/.optimus'.normalize();
+        if (!sys.FileSystem.exists(path)) {
+            uhx.uid.util.OptimusGenerator.config();
+        }
+
+        var json:uhx.uid.util.OptimusGenerator.OptimusValues 
+        = haxe.Json.parse(sys.io.File.getContent(path));
+
+        return macro new uhx.uid.Optimus(
+            $v{Std.parseInt(json.prime)},
+            $v{Std.parseInt(json.inverse)},
+            $v{Std.parseInt(json.random)}
+        );
+    }
+
     public var prime:Int64;
     public var inverse:Int64;
     public var random:Int64;
 
     public function new(prime:Int64, inverse:Int64, random:Int64):Void {
-        if (prime < MAX_INT && prime.millerRabin()) {
+        if (prime < MAX_INT && prime.isPrime(4)) {
             this.prime = prime;
+            if ((prime * inverse) & MAX_INT != 1) {
+                throw 'Inverse value $inverse is not the inverse of the Prime value $prime.';
+            }
             this.inverse = inverse;
             this.random = random;
 
@@ -35,13 +55,10 @@ class Optimus {
         return (((_v ^ random) * inverse) & MAX_INT).toInt();
     }
 
-    /*public static #if !debug inline #end function generatePrime():Float {
-        return BigFloat.randomBetween(1e7, MAX_INT);
+    public static function gcd(a:Int64, b:Int64) {
+        if (b == 0) return a;
+        return gcd(b, a%b);
     }
-
-    public static #if !debug inline #end function generateInverse(prime:Float):Float {
-        return modInverse(prime, MAX_INT + 1);
-    }*/
 
     /*
     * Calculate the extended Euclid Algorithm or extended GCD.
@@ -81,123 +98,143 @@ class Optimus {
             oldY = n;
         }
         return [b, signX * x, signY * y];
-
+        /*if (a == 0) {
+            return [b, 0, 1];
+        } else {
+            var r = egcd(b % a, a);
+            var g = r[0], x = r[1], y = r[2]; 
+            return [g, x - (b / a) * y, y];
+        }*/
+        //if (a.isNeg()) a = a.neg();
+        //if (b.isNeg()) b = b.neg();
+        /*if (b == 0) {
+            return [a, 1, 0];
+        } else {
+            var r = egcd(b, a%b);
+            var t = r[1];
+            var t2 = r[2];
+            r[1] = r[2];
+            r[2] = t - (a/b) * t2;
+            return r;
+        }*/
     }
 
     /*
     * Calculate the modular inverse of a number.
     * ---
-    * @see https://github.com/numbers/numbers.js/blob/master/lib/numbers/basic.js#L444
+    * @see http://www.geeksforgeeks.org/multiplicative-inverse-under-modulo-m/
     */
     public static #if !debug inline #end function modInverse(a:Int64, m:Int64):Int64 {
-        var r = egcd(a, m);
-        if (r.length == 0 || r[0] != 1) {
-            throw 'modular inverse does not exist';
-
-        } else {
-            return r[1] % m;
-
+        var m0:Int64 = m, t:Int64, q:Int64;
+        var x0:Int64 = 0;
+        var x1:Int64 = 1;
+    
+        if (m == 1) return 0;
+    
+        while (a > 1) {
+            // q is quotient
+            q = a / m;
+    
+            t = m;
+    
+            // m is remainder now, process same as
+            // Euclid's algo
+            m = a % m;
+            a = t;
+    
+            t = x0;
+    
+            x0 = x1 - q * x0;
+    
+            x1 = t;
         }
-
+    
+        // Make x1 positive
+        if (x1 < 0) x1 += m0;
+    
+        return x1;
     }
 
     /*
     * Determine if a number is prime in Polynomial time, using a randomized algorithm.
-    * http://en.wikipedia.org/wiki/Miller-Rabin_primality_test
     * ---
-    * @see https://github.com/numbers/numbers.js/blob/df0a1cb39d4d0a5e4c8218a31fac1d6eb24b7444/lib/numbers/prime.js#L92
+    * @see http://www.geeksforgeeks.org/primality-test-set-3-miller-rabin/
     */
-    public static function millerRabin(n:Int64, ?itr:Int = 20):Bool {
-        if (n == 2) return true;
-        if (n <= 1 || n % 2 == 0) return false;
-        
-        var s = 0;
-        var d:Int64 = n - 1;
-
-        while (true) {
-            var dm = d.divMod(2);
-            var quotient = dm.quotient;
-            var remainder = dm.modulus;
-
-            if (remainder == 1) break;
-
-            s += 1;
-            d = quotient;
+    public static function millerRabin(d:Int64, n:Int64):Bool {
+        // Pick a random number in [2..n-2]
+        // Corner cases make sure that n > 4
+        //var a = 2 + Math.random() % (n - 4);
+        var a = Random.int(2, n.toInt()-4);
+    
+        // Compute a^d % n
+        var x = powerMod(a, d, n);
+    
+        if (x == 1  || x == n-1) return true;
+    
+        // Keep squaring x while one of the following doesn't
+        // happen
+        // (i)   d does not reach n-1
+        // (ii)  (x^2) % n is not 1
+        // (iii) (x^2) % n is not n-1
+        while (d != n-1) {
+            x = (x * x) % n;
+            d *= 2;
+    
+            if (x == 1) return false;
+            if (x == n-1) return true;
         }
-        
-        var tryComposite = function (a) {
-            if (powerMod(a, d, n) == 1) return false;
+    
+        // Return composite
+        return false;
+    }
 
-            var i = 0;
-            while (i < s) {
-                if (powerMod(a, power(2, i) * d, n) == n - 1) return false;
-                
-                i++;
-            }
-
-            return true;
-        };
-
+    // @see http://www.geeksforgeeks.org/primality-test-set-3-miller-rabin/
+    public static #if !debug inline #end function isPrime(n:Int64, k:Int64):Bool {
+        // Corner cases
+        if (n <= 1 || n == 4)  return false;
+        if (n <= 3) return true;
+    
+        // Find r such that n = 2^d * r + 1 for some r >= 1
+        var d = n - 1;
+        while (d % 2 == 0) d /= 2;
+    
+        // Iterate given nber of 'k' times
         var i = 0;
-        while (i < itr) {
-            var a = 2 + Math.floor(Math.random() * (n.toInt() - 2 - 2));
-            if (tryComposite(a)) return false;
-            
+        while (i < k) {
+            if (millerRabin(d, n) == false) return false;
             i++;
         }
-
+    
         return true;
     }
 
     /*
-    * Calculate:
-    * if b >= 1: a^b mod m.
-    * if b = -1: modInverse(a, m).
-    * if b < 1: finds a modular rth root of a such that b = 1/r.
     * ---
-    * @see https://github.com/numbers/numbers.js/blob/master/lib/numbers/basic.js#L367
+    * @see https://stackoverflow.com/a/8498251
     */
     public static #if !debug inline #end function powerMod(a:Int64, b:Int64, m:Int64):Int64 {
-        // If b < -1 should be a small number, this method should work for now.
-        if (b < -1) return power(a, b) % m;
-        if (b == 0) return 1 % m;
-        if (b >= 1) {
-            var result:Int64 = 1;
-
-            while (b > 0) {
-                if ((b % 2) == 1) {
-                    result = (result * a) % m;
-                }
-
-                a = (a * a) % m;
-                b = b >> 1;
-            }
-
-            return result;
+        a %= m;
+        var result:Int64 = 1;
+        while (b > 0) {
+            if (b & 1 == 1) result = (result * a) % m;
+            a = (a * a) % m;
+            b >>= 1;
         }
-
-        if (b == -1) return modInverse(a, m);
-        if (b < 1) {
-            return powerMod(a, power(b, -1), m);
-        }
-        return b;
+        return result;
     }
     
     /**
-    * @see https://stackoverflow.com/a/38666376
+    * @see https://stackoverflow.com/a/101613
     **/
     public static #if !debug inline #end function power(x:Int64, y:Int64):Int64 {
-        if (y==0) {
-            return 1;
-
-        } else if (y%2 == 0) {
-            return power(x, y/2) * power(x, y/2);
-
-        } else {
-            return x * power(x, y/2) * power(x, y/2);
-
+        var result:Int64 = 1;
+        while (y != 0) {
+            if (y & 1 == 1) result *= x;
+            y >>= 1;
+            x *= x;
         }
 
+        return result;
     }
 
     public static #if !debug inline #end function divMod(a:Int64, b:Int64):{quotient:Int64, remainder:Int64} {

@@ -1,7 +1,8 @@
 -lib yaml
 -lib utest
+-lib random
 -lib thx.core
-#-lib jstack
+-lib tink_core
 
 -cp src
 -cp tests
@@ -10,7 +11,6 @@
 
 -debug
 -D analyzer-optimize
-#-D source_map
 
 -main Main
 
@@ -26,12 +26,12 @@
 
 -python bin/regle.py
 
---next
+#--next
 
 #-c-arg -Xlint:deprecation
 #-java bin/java
 
-#--next
+--next
 
 -cs bin/cs
 

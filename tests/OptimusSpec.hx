@@ -12,7 +12,11 @@ using haxe.Int64;
     private var composites = [1, 4, 18, 25, 838, 3007];
 
     public function new() {
+        
+    }
 
+    public function testGcd() {
+        Assert.equals( 11, Optimus.gcd(121, 44).toInt() );
     }
 
     public function testEgcd() {
@@ -24,6 +28,19 @@ using haxe.Int64;
 
     public function testModInverse() {
         Assert.equals( 1, Optimus.modInverse(1, 5).toInt() );
+        Assert.equals( 59260789, Optimus.modInverse(1580030173, Optimus.MAX_INT + 1).toInt() );
+        Assert.equals( 4, Optimus.modInverse(30, 17).toInt() );
+        Assert.equals( 4, Optimus.modInverse(3, 11).toInt() );
+        Assert.equals( 1885413229, Optimus.modInverse(2123809381, Optimus.MAX_INT + 1).toInt() );
+
+        Assert.equals( 4, Optimus.modInverse(3, 11).toInt() );
+        Assert.equals( 4, Optimus.modInverse(3, 11).toInt() );
+        Assert.equals( 59260789, Optimus.modInverse(1580030173, Optimus.MAX_INT + 1).toInt() );
+    }
+
+    public function testPower() {
+        Assert.equals( 8, Optimus.power(2, 3).toInt() );
+        Assert.equals( 3125, Optimus.power(5, 5).toInt() );
     }
 
     public function testPowerMod() {
@@ -42,12 +59,12 @@ using haxe.Int64;
 
     public function testMillerRabin() {
         for (i in primes) {
-            var r = Optimus.millerRabin(i);
+            var r = Optimus.isPrime(i, 4);
             Assert.equals( true, r, 'Primes, value == $i --- Should have been true but was $r.' );
         }
 
         for (i in composites) {
-            var r = Optimus.millerRabin(i);
+            var r = Optimus.isPrime(i, 4);
             Assert.equals( false, r, 'Composites, value == $i --- Should have been false but was $r.' );
         }
     }
@@ -58,6 +75,13 @@ using haxe.Int64;
 
     public function testDecode() {
         Assert.equals( 15, optimus.decode(1103647397) );
+    }
+
+    public function testConfig() {
+        var opt = Optimus.make();
+        var encoded = opt.encode(20);
+        
+        Assert.equals( 20, opt.decode(encoded) );
     }
 
 }
