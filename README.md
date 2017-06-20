@@ -56,5 +56,8 @@ class Main {
 }
 ```
 
+To generate project specific values, call `Optimus.make()` which will generate an `.optimus` file containing a Json string. The only
+dependency at the moment to use `Opimus.make()` is to have the `unzip` command available. See [`OptimusSpec`](https://github.com/skial/regle/blob/master/tests/OptimusSpec.hx#L80) for an example.
+
 [Hashids]: http://hashids.org/ "Generate short, unique, non-sequential ids"
 [Optimus]: https://github.com/jenssegers/optimus "Id obfuscation based on Knuth's multiplicative hashing method"

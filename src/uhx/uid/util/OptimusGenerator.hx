@@ -118,8 +118,6 @@ class OptimusGenerator {
         }
 
         var inverse = uhx.uid.Optimus.modInverse(prime, uhx.uid.Optimus.MAX_INT + 1);
-        //if (inverse.isNeg()) inverse = inverse.neg();
-        trace( (prime * inverse) & uhx.uid.Optimus.MAX_INT );
         
         return {
             prime:prime.toStr(), 
