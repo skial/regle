@@ -31,7 +31,7 @@ class Optimus {
     public var random:Int64;
 
     public function new(prime:Int64, inverse:Int64, random:Int64):Void {
-        if (prime < MAX_INT && prime.millerRabin()) {
+        if (prime < MAX_INT && prime.isPrime(4)) {
             this.prime = prime;
             if ((prime * inverse) & MAX_INT != 1) {
                 throw 'Inverse value $inverse is not the inverse of the Prime value $prime.';
@@ -122,63 +122,16 @@ class Optimus {
     /*
     * Calculate the modular inverse of a number.
     * ---
-    * @see https://github.com/numbers/numbers.js/blob/master/lib/numbers/basic.js#L444
+    * @see http://www.geeksforgeeks.org/multiplicative-inverse-under-modulo-m/
     */
     public static #if !debug inline #end function modInverse(a:Int64, m:Int64):Int64 {
-
-        var r = egcd(a, m);
-        if (r.length == 0 || r[0] != 1) {
-            throw 'modular inverse does not exist';
-
-        } else {
-            return (r[1] % m + m) % m;
-            //return powerMod(a, m-2, m);
-
-        }
-        /*var t:Int64 = 0;
-        var newT:Int64 = 1;
-        var r:Int64 = m;
-        var newR:Int64 = a.isNeg() ? a.neg() : a;
-        var q:Int64 = 0;
-        var lastT:Int64 = 0;
-        var lastR:Int64 = 0;
-
-        while (newR != 0) {
-            q = r / newR;
-            lastT = t;
-            lastR = r;
-            t = newT;
-            r = newR;
-            newT = lastT - (q * newT);
-            newR = lastR - (q * newR);
-        }
-
-        if (r != 1) throw '$a and $m are not co-prime';
-        if (t < 0) t += m;
-        if (a.isNeg()) t = t.neg();
-        return t;*/
-    }
-
-    public static function naiveModInverse(a:Int64, m:Int64):Int64 {
-        a = a%m;
-        var x:Int64 = 1;
-        while(x<m) {
-            if ((a*x) % m == 1) return x;
-            x++;
-        }
-        throw 'modular inverse does not exist';
-    }
-
-    // @see http://www.geeksforgeeks.org/multiplicative-inverse-under-modulo-m/
-    public static function iterativeModInverse(a:Int64, m:Int64):Int64
-    {
         var m0:Int64 = m, t:Int64, q:Int64;
-        var x0:Int64 = 0, x1:Int64 = 1;
+        var x0:Int64 = 0;
+        var x1:Int64 = 1;
     
         if (m == 1) return 0;
     
-        while (a > 1)
-        {
+        while (a > 1) {
             // q is quotient
             q = a / m;
     
@@ -204,54 +157,10 @@ class Optimus {
 
     /*
     * Determine if a number is prime in Polynomial time, using a randomized algorithm.
-    * http://en.wikipedia.org/wiki/Miller-Rabin_primality_test
     * ---
-    * @see https://github.com/numbers/numbers.js/blob/df0a1cb39d4d0a5e4c8218a31fac1d6eb24b7444/lib/numbers/prime.js#L92
+    * @see http://www.geeksforgeeks.org/primality-test-set-3-miller-rabin/
     */
-    public static function millerRabin(n:Int64, ?itr:Int = 20):Bool {
-        if (n == 2) return true;
-        if (n <= 1 || n % 2 == 0) return false;
-        
-        var s = 0;
-        var d:Int64 = n - 1;
-
-        while (true) {
-            var dm = d.divMod(2);
-            var quotient = dm.quotient;
-            var remainder = dm.modulus;
-
-            if (remainder == 1) break;
-
-            s += 1;
-            d = quotient;
-        }
-        
-        var tryComposite = function (a) {
-            if (powerMod(a, d, n) == 1) return false;
-
-            var i = 0;
-            while (i < s) {
-                if (powerMod(a, power(2, i) * d, n) == n - 1) return false;
-                
-                i++;
-            }
-
-            return true;
-        };
-
-        var i = 0;
-        while (i < itr) {
-            var a = 2 + Math.floor(Math.random() * (n.toInt() - 2 - 2));
-            if (tryComposite(a)) return false;
-            
-            i++;
-        }
-
-        return true;
-    }
-
-    // @see http://www.geeksforgeeks.org/primality-test-set-3-miller-rabin/
-    public static function intMillerRabin(d:Int64, n:Int64):Bool {
+    public static function millerRabin(d:Int64, n:Int64):Bool {
         // Pick a random number in [2..n-2]
         // Corner cases make sure that n > 4
         //var a = 2 + Math.random() % (n - 4);
@@ -279,7 +188,8 @@ class Optimus {
         return false;
     }
 
-    public static function isPrime(n:Int64, k:Int64):Bool {
+    // @see http://www.geeksforgeeks.org/primality-test-set-3-miller-rabin/
+    public static #if !debug inline #end function isPrime(n:Int64, k:Int64):Bool {
         // Corner cases
         if (n <= 1 || n == 4)  return false;
         if (n <= 3) return true;
@@ -291,10 +201,7 @@ class Optimus {
         // Iterate given nber of 'k' times
         var i = 0;
         while (i < k) {
-
-        //for (int i = 0; i < k; i++)
-            if (intMillerRabin(d, n) == false) return false;
-
+            if (millerRabin(d, n) == false) return false;
             i++;
         }
     
@@ -303,33 +210,9 @@ class Optimus {
 
     /*
     * ---
-    * @see https://github.com/numbers/numbers.js/blob/master/lib/numbers/basic.js#L367
+    * @see https://stackoverflow.com/a/8498251
     */
     public static #if !debug inline #end function powerMod(a:Int64, b:Int64, m:Int64):Int64 {
-        // If b < -1 should be a small number, this method should work for now.
-        /*if (b < -1) return power(a, b) % m;
-        if (b == 0) return 1 % m;
-        if (b >= 1) {
-            var result:Int64 = 1;
-
-            while (b > 0) {
-                if ((b % 2) == 1) {
-                    result = (result * a) % m;
-                }
-
-                a = (a * a) % m;
-                b = b >> 1;
-            }
-
-            return result;
-        }
-
-        if (b == -1) return modInverse(a, m);
-        if (b < 1) {
-            return powerMod(a, power(b, -1), m);
-        }
-        return b;*/
-        // @see https://stackoverflow.com/a/8498251
         a %= m;
         var result:Int64 = 1;
         while (b > 0) {
@@ -341,20 +224,9 @@ class Optimus {
     }
     
     /**
-    * @see https://stackoverflow.com/a/38666376
+    * @see https://stackoverflow.com/a/101613
     **/
     public static #if !debug inline #end function power(x:Int64, y:Int64):Int64 {
-        /*if (y==0) {
-            return 1;
-
-        } else if (y%2 == 0) {
-            return power(x, y/2) * power(x, y/2);
-
-        } else {
-            return x * power(x, y/2) * power(x, y/2);
-
-        }*/
-        // @see https://stackoverflow.com/a/101613
         var result:Int64 = 1;
         while (y != 0) {
             if (y & 1 == 1) result *= x;

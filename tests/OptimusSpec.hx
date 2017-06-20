@@ -17,13 +17,6 @@ using haxe.Int64;
 
     public function testGcd() {
         Assert.equals( 11, Optimus.gcd(121, 44).toInt() );
-        trace( Optimus.gcd(1580030173, 2147483647) );
-        var a = 1580030173.ofInt();
-        var b = 2147483647.ofInt() + 1;
-        var i = Optimus.iterativeModInverse(a, b);
-        trace( i, a * i, (a*i) / b );
-        //trace( Optimus.intMillerRabin(1580030173, 20) );
-        trace( Optimus.isPrime(1580030173, 4) );
     }
 
     public function testEgcd() {
@@ -35,14 +28,14 @@ using haxe.Int64;
 
     public function testModInverse() {
         Assert.equals( 1, Optimus.modInverse(1, 5).toInt() );
-        Assert.equals( 59260789, Optimus.iterativeModInverse(1580030173, Optimus.MAX_INT + 1).toInt() );
+        Assert.equals( 59260789, Optimus.modInverse(1580030173, Optimus.MAX_INT + 1).toInt() );
         Assert.equals( 4, Optimus.modInverse(30, 17).toInt() );
         Assert.equals( 4, Optimus.modInverse(3, 11).toInt() );
-        Assert.equals( 1885413229, Optimus.iterativeModInverse(2123809381, Optimus.MAX_INT + 1).toInt() );
+        Assert.equals( 1885413229, Optimus.modInverse(2123809381, Optimus.MAX_INT + 1).toInt() );
 
-        Assert.equals( 4, Optimus.naiveModInverse(3, 11).toInt() );
-        Assert.equals( 4, Optimus.iterativeModInverse(3, 11).toInt() );
-        Assert.equals( 59260789, Optimus.iterativeModInverse(1580030173, Optimus.MAX_INT + 1).toInt() );
+        Assert.equals( 4, Optimus.modInverse(3, 11).toInt() );
+        Assert.equals( 4, Optimus.modInverse(3, 11).toInt() );
+        Assert.equals( 59260789, Optimus.modInverse(1580030173, Optimus.MAX_INT + 1).toInt() );
     }
 
     public function testPower() {
@@ -66,12 +59,12 @@ using haxe.Int64;
 
     public function testMillerRabin() {
         for (i in primes) {
-            var r = Optimus.millerRabin(i);
+            var r = Optimus.isPrime(i, 4);
             Assert.equals( true, r, 'Primes, value == $i --- Should have been true but was $r.' );
         }
 
         for (i in composites) {
-            var r = Optimus.millerRabin(i);
+            var r = Optimus.isPrime(i, 4);
             Assert.equals( false, r, 'Composites, value == $i --- Should have been false but was $r.' );
         }
     }
