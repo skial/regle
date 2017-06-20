@@ -159,6 +159,49 @@ class Optimus {
         return t;*/
     }
 
+    public static function naiveModInverse(a:Int64, m:Int64):Int64 {
+        a = a%m;
+        var x:Int64 = 1;
+        while(x<m) {
+            if ((a*x) % m == 1) return x;
+            x++;
+        }
+        throw 'modular inverse does not exist';
+    }
+
+    // @see http://www.geeksforgeeks.org/multiplicative-inverse-under-modulo-m/
+    public static function iterativeModInverse(a:Int64, m:Int64):Int64
+    {
+        var m0:Int64 = m, t:Int64, q:Int64;
+        var x0:Int64 = 0, x1:Int64 = 1;
+    
+        if (m == 1) return 0;
+    
+        while (a > 1)
+        {
+            // q is quotient
+            q = a / m;
+    
+            t = m;
+    
+            // m is remainder now, process same as
+            // Euclid's algo
+            m = a % m;
+            a = t;
+    
+            t = x0;
+    
+            x0 = x1 - q * x0;
+    
+            x1 = t;
+        }
+    
+        // Make x1 positive
+        if (x1 < 0) x1 += m0;
+    
+        return x1;
+    }
+
     /*
     * Determine if a number is prime in Polynomial time, using a randomized algorithm.
     * http://en.wikipedia.org/wiki/Miller-Rabin_primality_test
@@ -207,17 +250,64 @@ class Optimus {
         return true;
     }
 
+    // @see http://www.geeksforgeeks.org/primality-test-set-3-miller-rabin/
+    public static function intMillerRabin(d:Int64, n:Int64):Bool {
+        // Pick a random number in [2..n-2]
+        // Corner cases make sure that n > 4
+        //var a = 2 + Math.random() % (n - 4);
+        var a = Random.int(2, n.toInt()-4);
+    
+        // Compute a^d % n
+        var x = powerMod(a, d, n);
+    
+        if (x == 1  || x == n-1) return true;
+    
+        // Keep squaring x while one of the following doesn't
+        // happen
+        // (i)   d does not reach n-1
+        // (ii)  (x^2) % n is not 1
+        // (iii) (x^2) % n is not n-1
+        while (d != n-1) {
+            x = (x * x) % n;
+            d *= 2;
+    
+            if (x == 1) return false;
+            if (x == n-1) return true;
+        }
+    
+        // Return composite
+        return false;
+    }
+
+    public static function isPrime(n:Int64, k:Int64):Bool {
+        // Corner cases
+        if (n <= 1 || n == 4)  return false;
+        if (n <= 3) return true;
+    
+        // Find r such that n = 2^d * r + 1 for some r >= 1
+        var d = n - 1;
+        while (d % 2 == 0) d /= 2;
+    
+        // Iterate given nber of 'k' times
+        var i = 0;
+        while (i < k) {
+
+        //for (int i = 0; i < k; i++)
+            if (intMillerRabin(d, n) == false) return false;
+
+            i++;
+        }
+    
+        return true;
+    }
+
     /*
-    * Calculate:
-    * if b >= 1: a^b mod m.
-    * if b = -1: modInverse(a, m).
-    * if b < 1: finds a modular rth root of a such that b = 1/r.
     * ---
     * @see https://github.com/numbers/numbers.js/blob/master/lib/numbers/basic.js#L367
     */
     public static #if !debug inline #end function powerMod(a:Int64, b:Int64, m:Int64):Int64 {
         // If b < -1 should be a small number, this method should work for now.
-        if (b < -1) return power(a, b) % m;
+        /*if (b < -1) return power(a, b) % m;
         if (b == 0) return 1 % m;
         if (b >= 1) {
             var result:Int64 = 1;
@@ -238,7 +328,16 @@ class Optimus {
         if (b < 1) {
             return powerMod(a, power(b, -1), m);
         }
-        return b;
+        return b;*/
+        // @see https://stackoverflow.com/a/8498251
+        a %= m;
+        var result:Int64 = 1;
+        while (b > 0) {
+            if (b & 1 == 1) result = (result * a) % m;
+            a = (a * a) % m;
+            b >>= 1;
+        }
+        return result;
     }
     
     /**
