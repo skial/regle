@@ -98,25 +98,6 @@ class Optimus {
             oldY = n;
         }
         return [b, signX * x, signY * y];
-        /*if (a == 0) {
-            return [b, 0, 1];
-        } else {
-            var r = egcd(b % a, a);
-            var g = r[0], x = r[1], y = r[2]; 
-            return [g, x - (b / a) * y, y];
-        }*/
-        //if (a.isNeg()) a = a.neg();
-        //if (b.isNeg()) b = b.neg();
-        /*if (b == 0) {
-            return [a, 1, 0];
-        } else {
-            var r = egcd(b, a%b);
-            var t = r[1];
-            var t2 = r[2];
-            r[1] = r[2];
-            r[2] = t - (a/b) * t2;
-            return r;
-        }*/
     }
 
     /*
