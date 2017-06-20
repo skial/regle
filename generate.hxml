@@ -1,5 +1,6 @@
 -cp src
 -debug
 -lib random
+-lib tink_core
 -D eval-stack
---macro uhx.uid.util.OptimusGenerator.init()
+--macro uhx.uid.util.OptimusGenerator.json()

@@ -2,12 +2,29 @@ package uhx.uid;
 
 import haxe.Int64;
 
+using haxe.io.Path;
 using uhx.uid.Optimus;
 using haxe.Int64;
 
 class Optimus {
 
     public static var MAX_INT:Int64 = 2147483647.ofInt();
+
+    public static macro function make() {
+        var path = '${Sys.getCwd()}/.optimus'.normalize();
+        if (!sys.FileSystem.exists(path)) {
+            uhx.uid.util.OptimusGenerator.config();
+        }
+
+        var json:uhx.uid.util.OptimusGenerator.OptimusValues 
+        = haxe.Json.parse(sys.io.File.getContent(path));
+
+        return macro new uhx.uid.Optimus(
+            $v{Std.parseInt(json.prime)},
+            $v{Std.parseInt(json.inverse)},
+            $v{Std.parseInt(json.random)}
+        );
+    }
 
     public var prime:Int64;
     public var inverse:Int64;
@@ -16,6 +33,9 @@ class Optimus {
     public function new(prime:Int64, inverse:Int64, random:Int64):Void {
         if (prime < MAX_INT && prime.millerRabin()) {
             this.prime = prime;
+            if ((prime * inverse) & MAX_INT != 1) {
+                throw 'Inverse value $inverse is not the inverse of the Prime value $prime.';
+            }
             this.inverse = inverse;
             this.random = random;
 
@@ -35,13 +55,10 @@ class Optimus {
         return (((_v ^ random) * inverse) & MAX_INT).toInt();
     }
 
-    /*public static #if !debug inline #end function generatePrime():Int64 {
-        return (1e7, MAX_INT);
+    public static function gcd(a:Int64, b:Int64) {
+        if (b == 0) return a;
+        return gcd(b, a%b);
     }
-
-    public static #if !debug inline #end function generateInverse(prime:Int64):Int64 {
-        return modInverse(prime, MAX_INT + 1);
-    }/*
 
     /*
     * Calculate the extended Euclid Algorithm or extended GCD.
@@ -81,7 +98,25 @@ class Optimus {
             oldY = n;
         }
         return [b, signX * x, signY * y];
-
+        /*if (a == 0) {
+            return [b, 0, 1];
+        } else {
+            var r = egcd(b % a, a);
+            var g = r[0], x = r[1], y = r[2]; 
+            return [g, x - (b / a) * y, y];
+        }*/
+        //if (a.isNeg()) a = a.neg();
+        //if (b.isNeg()) b = b.neg();
+        /*if (b == 0) {
+            return [a, 1, 0];
+        } else {
+            var r = egcd(b, a%b);
+            var t = r[1];
+            var t2 = r[2];
+            r[1] = r[2];
+            r[2] = t - (a/b) * t2;
+            return r;
+        }*/
     }
 
     /*
@@ -90,15 +125,38 @@ class Optimus {
     * @see https://github.com/numbers/numbers.js/blob/master/lib/numbers/basic.js#L444
     */
     public static #if !debug inline #end function modInverse(a:Int64, m:Int64):Int64 {
+
         var r = egcd(a, m);
         if (r.length == 0 || r[0] != 1) {
             throw 'modular inverse does not exist';
 
         } else {
-            return r[1] % m;
+            return (r[1] % m + m) % m;
+            //return powerMod(a, m-2, m);
 
         }
+        /*var t:Int64 = 0;
+        var newT:Int64 = 1;
+        var r:Int64 = m;
+        var newR:Int64 = a.isNeg() ? a.neg() : a;
+        var q:Int64 = 0;
+        var lastT:Int64 = 0;
+        var lastR:Int64 = 0;
 
+        while (newR != 0) {
+            q = r / newR;
+            lastT = t;
+            lastR = r;
+            t = newT;
+            r = newR;
+            newT = lastT - (q * newT);
+            newR = lastR - (q * newR);
+        }
+
+        if (r != 1) throw '$a and $m are not co-prime';
+        if (t < 0) t += m;
+        if (a.isNeg()) t = t.neg();
+        return t;*/
     }
 
     /*
@@ -187,7 +245,7 @@ class Optimus {
     * @see https://stackoverflow.com/a/38666376
     **/
     public static #if !debug inline #end function power(x:Int64, y:Int64):Int64 {
-        if (y==0) {
+        /*if (y==0) {
             return 1;
 
         } else if (y%2 == 0) {
@@ -196,8 +254,16 @@ class Optimus {
         } else {
             return x * power(x, y/2) * power(x, y/2);
 
+        }*/
+        // @see https://stackoverflow.com/a/101613
+        var result:Int64 = 1;
+        while (y != 0) {
+            if (y & 1 == 1) result *= x;
+            y >>= 1;
+            x *= x;
         }
 
+        return result;
     }
 
     public static #if !debug inline #end function divMod(a:Int64, b:Int64):{quotient:Int64, remainder:Int64} {

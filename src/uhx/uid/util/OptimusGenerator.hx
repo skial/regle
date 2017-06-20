@@ -6,27 +6,38 @@ import haxe.macro.Context;
 
 using StringTools;
 using haxe.Int64;
+using sys.io.File;
+using tink.CoreApi;
 using haxe.io.Path;
 using sys.FileSystem;
 using uhx.uid.Optimus;
 
+typedef OptimusValues = {
+    var prime:String;
+    var inverse:String;
+    var random:String;
+}
+
 class OptimusGenerator {
 
-    public static function init() {
+    private static function random():Surprise<OptimusValues, String> {
         var base = 'http://primes.utm.edu/lists/small/millions/primes_.zip';
         var primeDirectory = '${Sys.getCwd()}/primes/';
         var random = Std.random(50) + 1;
         var url = base.replace('_', '' + random);
+        var f = Future.trigger();
+
         if (!'$primeDirectory/primes$random.zip'.exists()) {
             trace( 'Fetching $url' );
             var http = new haxe.Http(url);
             http.onData = function(d) {
                 if (!primeDirectory.exists()) primeDirectory.createDirectory();
                 sys.io.File.saveBytes('$primeDirectory/primes$random.zip', haxe.io.Bytes.ofString(d) );
-                extractPrimes('$primeDirectory/primes$random.zip');
+                var r = extractPrimes('$primeDirectory/primes$random.zip');
+                f.trigger( r == null ? Failure('please rerun generator.') : Success(r) );
             }
             http.onError = function(e) {
-                trace(e);
+                f.trigger( Failure(e) );
             }
             http.onStatus = function(s) {
                 trace(s);
@@ -34,14 +45,17 @@ class OptimusGenerator {
             http.request();
 
         } else {
-            extractPrimes('$primeDirectory/primes$random.zip');
+            var r = extractPrimes('$primeDirectory/primes$random.zip');
+            f.trigger( r == null ? Failure('please rerun generator.') : Success(r) );
 
         }
 
+        return f.asFuture();
     }
 
-    private static function extractPrimes(path:String):Void {
+    private static function extractPrimes(path:String):Null<OptimusValues> {
         var code = 0;
+        var result = null;
         var unzip = 'unzip';
         var txtPath = path.withoutExtension() + '.txt';
 
@@ -74,13 +88,14 @@ class OptimusGenerator {
         }
 
         if (code == 0 && txtPath.exists()) {
-            var result = extractFromText(txtPath);
-            Sys.println(result);
+            result = extractFromText(txtPath);
+            
         }
 
+        return result;
     }
 
-    private static function extractFromText(path:String):String {
+    private static function extractFromText(path:String):OptimusValues {
         var str = sys.io.File.getContent(path);
            
         str = str.substring(str.indexOf(')')+1, str.length).trim();
@@ -97,15 +112,16 @@ class OptimusGenerator {
         var sections = ~/[ \r\n]+/g.split(section).filter(s->s.length>2);
         var prime = sections[Std.random(sections.length)].parseString();
 
-        while (!prime.millerRabin(100)) {
+        while (!uhx.uid.Optimus.millerRabin(prime.toInt(), 100)) {
             prime = sections[Std.random(sections.length)].parseString();
 
         }
 
-        var inverse = prime.modInverse(uhx.uid.Optimus.MAX_INT-1);
-        if (inverse.isNeg()) inverse = inverse.neg();
-
-        return haxe.Json.stringify( {
+        var inverse = uhx.uid.Optimus.modInverse(prime.toInt(), uhx.uid.Optimus.MAX_INT);
+        //if (inverse.isNeg()) inverse = inverse.neg();
+        trace( (prime * inverse) & uhx.uid.Optimus.MAX_INT );
+        
+        return {
             prime:prime.toStr(), 
             inverse:inverse.toStr(), 
             random:(
@@ -116,7 +132,43 @@ class OptimusGenerator {
                 ) 
                 & uhx.uid.Optimus.MAX_INT
             ).toStr()
+        };
+    }
+
+    // User methods
+
+    public static function json() {
+        random().handle( function(o) {
+            switch o {
+                case Success(s):
+                    Sys.println(haxe.Json.stringify(s));
+
+                case Failure(e):
+                    Sys.println(haxe.Json.stringify({error:e}));
+
+            }
+
         } );
+
+    }
+
+    public static function config() {
+        var path = '${Sys.getCwd()}/.optimus'.normalize();
+
+        if (!path.exists()) random().handle( function(o) {
+            switch o {
+                case Success(s):
+                    path.saveContent(
+                        haxe.Json.stringify(s)
+                    );
+
+                case Failure(e):
+                    Sys.println(haxe.Json.stringify({error:e}));
+
+            }
+
+        } );
+
     }
 
 }

@@ -10,8 +10,9 @@
   "url": "https://github.com/skial/regle",
   "dependencies": {
     "yaml": "",
-    "thx.core": "",
     "utest": "",
-    "random": ""
+    "random": "",
+    "thx.core": "",
+    "tink_core": ""
   }
 }

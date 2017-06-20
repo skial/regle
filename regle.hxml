@@ -1,6 +1,8 @@
 -lib yaml
 -lib utest
+-lib random
 -lib thx.core
+-lib tink_core
 
 -cp src
 -cp tests
@@ -12,32 +14,32 @@
 
 -main Main
 
---each
+#--each
 
--neko bin/regle.n
+#-neko bin/regle.n
 
---next
+#--next
 
--js bin/regle.js
+#-js bin/regle.js
 
---next
+#--next
 
--python bin/regle.py
+#-python bin/regle.py
 
---next
+#--next
 
 #-c-arg -Xlint:deprecation
 #-java bin/java
 
 #--next
 
--cs bin/cs
+#-cs bin/cs
 
---next
+#--next
 
--D php7
--php bin/php
+#-D php7
+#-php bin/php
 
---next
+#--next
 
 --macro Main.main()
