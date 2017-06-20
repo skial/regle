@@ -170,7 +170,7 @@ class Optimus {
     }
 
     // @see http://www.geeksforgeeks.org/primality-test-set-3-miller-rabin/
-    public static #if !debug inline #end function isPrime(n:Int64, k:Int64):Bool {
+    public static function isPrime(n:Int64, k:Int64):Bool {
         // Corner cases
         if (n <= 1 || n == 4)  return false;
         if (n <= 3) return true;
