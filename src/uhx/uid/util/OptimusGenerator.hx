@@ -112,12 +112,12 @@ class OptimusGenerator {
         var sections = ~/[ \r\n]+/g.split(section).filter(s->s.length>2);
         var prime = sections[Std.random(sections.length)].parseString();
 
-        while (!uhx.uid.Optimus.millerRabin(prime.toInt(), 100)) {
+        while (!uhx.uid.Optimus.isPrime(prime, 4)) {
             prime = sections[Std.random(sections.length)].parseString();
 
         }
 
-        var inverse = uhx.uid.Optimus.modInverse(prime.toInt(), uhx.uid.Optimus.MAX_INT);
+        var inverse = uhx.uid.Optimus.modInverse(prime, uhx.uid.Optimus.MAX_INT + 1);
         //if (inverse.isNeg()) inverse = inverse.neg();
         trace( (prime * inverse) & uhx.uid.Optimus.MAX_INT );
         

@@ -77,11 +77,11 @@ using haxe.Int64;
         Assert.equals( 15, optimus.decode(1103647397) );
     }
 
-    /*public function testConfig() {
+    public function testConfig() {
         var opt = Optimus.make();
         var encoded = opt.encode(20);
         
         Assert.equals( 20, opt.decode(encoded) );
-    }*/
+    }
 
 }
