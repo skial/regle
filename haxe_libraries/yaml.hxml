@@ -1,0 +1,3 @@
+# @install: lix --silent download "haxelib:yaml#1.3.0" into yaml/1.3.0/haxelib
+-D yaml=1.3.0
+-cp ${HAXESHIM_LIBCACHE}/yaml/1.3.0/haxelib/
