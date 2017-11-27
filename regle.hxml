@@ -1,7 +1,6 @@
 -lib yaml
 -lib utest
 -lib random
--lib thx.core
 -lib tink_core
 
 -cp src
@@ -31,9 +30,9 @@
 #-c-arg -Xlint:deprecation
 #-java bin/java
 
---next
+#--next
 
--cs bin/cs
+#-cs bin/cs
 
 --next
 
