@@ -2,13 +2,14 @@
 -lib utest
 -lib random
 -lib tink_core
+-lib hashids
 
 -cp src
 -cp tests
 
 -dce full
 
--debug
+#-debug
 -D analyzer-optimize
 
 -main Main
@@ -19,6 +20,7 @@
 
 --next
 
+-lib hxnodejs
 -js bin/regle.js
 
 --next
@@ -39,6 +41,10 @@
 -D php7
 -php bin/php
 
+#--next
+
+#--macro Main.main()
+
 --next
 
---macro Main.main()
+-hl bin/regle.hl

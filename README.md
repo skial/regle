@@ -9,6 +9,7 @@ Regle is a collection of utilities that generate ids.
 Regle currently contains:
 	
 - An [Hashids] port that generates short, unique, non-sequential ids from numbers.
+	+ To access the original `uhx.uid` Hashids implementation add `-D uhx_hashids`. The lib `hashids` by @kevinresol has better expanded tests.
 - An [Optimus] port that obfuscates ids based on Knuth's multiplicative hashing method.
 
 ## Installation
@@ -16,7 +17,8 @@ Regle currently contains:
 You need to install the following libraries from HaxeLib and GitHub.
 
 1. yaml - `haxelib install yaml`
-2. regle - `haxelib git regle https://github.com/skial/regle master src`
+2. hashids - `haxelib git hashids https://github.com/kevinresol/hashids master src`
+3. regle - `haxelib git regle https://github.com/skial/regle master src`
 
 Then in your `.hxml` file, add `-lib regle` and you're set.
 

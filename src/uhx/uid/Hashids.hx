@@ -2,6 +2,9 @@ package uhx.uid;
 
 import yaml.util.Ints;
 
+#if !uhx_hashids
+typedef Hashids = hashids.Hashids;
+#else
 /**
  * @author Skial Bainn
  * Port of the JavaScript version of Hashids
@@ -240,3 +243,4 @@ class Hashids {
 	}
 	
 }
+#end
