@@ -1,0 +1,36 @@
+-lib yaml
+-lib random
+-lib tink_core
+-lib tink_unittest
+-lib tink_testrunner
+-lib hashids
+
+-cp src
+-cp tests
+
+-dce full
+
+-D analyzer-optimize
+
+-main Bench
+
+--each
+
+-neko bin/bench.n
+
+--next
+
+-lib hxnodejs
+-js bin/bench.js
+
+--next
+
+-python bin/bench.py
+
+--next
+
+-php bin/bench
+
+--next
+
+-hl bin/bench.hl

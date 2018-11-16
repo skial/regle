@@ -1,7 +1,8 @@
 -lib yaml
--lib utest
 -lib random
 -lib tink_core
+-lib tink_unittest
+-lib tink_testrunner
 -lib hashids
 
 -cp src

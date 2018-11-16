@@ -2,15 +2,19 @@ package uhx.uid;
 
 import yaml.util.Ints;
 
+typedef Hashids =
 #if !uhx_hashids
-typedef Hashids = hashids.Hashids;
+	hashids.Hashids
 #else
+	uhx.uid.Hashids.UhxHashids
+#end
+;
 /**
  * @author Skial Bainn
  * Port of the JavaScript version of Hashids
  * @see http://hashids.org/
  */
-class Hashids {
+class UhxHashids {
 	
 	private var salt:String = '';
 	private var alphabet:String = '';
@@ -243,4 +247,3 @@ class Hashids {
 	}
 	
 }
-#end
