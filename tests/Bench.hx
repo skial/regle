@@ -3,12 +3,12 @@ package ;
 import tink.unit.*;
 import tink.testrunner.*;
 
-class Main {
+class Bench {
 
     public static function main() {
         Runner.run(TestBatch.make([
-            new HashidsSpec(),
-            new OptimusSpec(),
+            new HashidsBench(),
+            new OptimusBench(),
         ]));
     }
 
