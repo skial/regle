@@ -50,6 +50,6 @@
 
 #--macro Main.main()
 
---next
+#--next
 
--hl bin/regle.hl
+#-hl bin/regle.hl
