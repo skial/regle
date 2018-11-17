@@ -25,6 +25,10 @@
 
 --next
 
+-js bin/bench.browser.js
+
+--next
+
 -python bin/bench.py
 
 --next
