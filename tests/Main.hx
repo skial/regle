@@ -9,6 +9,7 @@ class Main {
         Runner.run(TestBatch.make([
             new HashidsSpec(),
             new OptimusSpec(),
+            new NanoidSpec(),
         ]));
     }
 

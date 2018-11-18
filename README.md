@@ -11,6 +11,8 @@ Regle currently contains:
 - An [Hashids] port that generates short, unique, non-sequential ids from numbers.
 	+ To access the original `uhx.uid` Hashids implementation add `-D uhx_hashids`. The lib `hashids` by @kevinresol has better expanded tests.
 - An [Optimus] port that obfuscates ids based on Knuth's multiplicative hashing method.
+- An [Nano ID] port that is a tiny, _platform dependant_ secure, URL friendly, unique string ID generator.
+	+ The [HashLink](https://github.com/HaxeFoundation/hashlink/blob/master/src/std/random.c) & Neko targets uses `Math.random`. They pass the flat distribution test, but wont be classed as secure.
 
 ## Installation
 
@@ -61,5 +63,24 @@ class Main {
 To generate project specific values, call `Optimus.make()` which will generate an `.optimus` file containing a Json string. The only
 dependency at the moment to use `Opimus.make()` is to have the `unzip` command available. See [`OptimusSpec`](https://github.com/skial/regle/blob/master/tests/OptimusSpec.hx#L80) for an example.
 
+## Nano ID Usage
+```Haxe
+package ;
+
+import uhx.uid.Nanoid;
+
+class Main {
+
+	public static function main() {
+		var nanoid = new Nanoid();
+		var id = nanoid.toString(); // `nanoid.toString() == nanoid.toString()` == true.
+		// Using a custom alphabet and length
+		var id = Nanoid.generate(Nanoid.Url, 50);
+	}
+
+}
+```
+
 [Hashids]: http://hashids.org/ "Generate short, unique, non-sequential ids"
 [Optimus]: https://github.com/jenssegers/optimus "Id obfuscation based on Knuth's multiplicative hashing method"
+[Nano ID]: https://github.com/ai/nanoid "Tiny, secure, URL friendly, unique string ID generator"

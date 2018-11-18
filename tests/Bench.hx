@@ -9,6 +9,7 @@ class Bench {
         Runner.run(TestBatch.make([
             new HashidsBench(),
             new OptimusBench(),
+            new NanoidBench(),
         ]));
     }
 

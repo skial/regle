@@ -26,6 +26,10 @@
 
 --next
 
+-js bin/regle.browser.js
+
+--next
+
 -python bin/regle.py
 
 #--next
@@ -39,7 +43,6 @@
 
 --next
 
--D php7
 -php bin/php
 
 #--next

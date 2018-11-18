@@ -10,7 +10,6 @@ class Optimus {
 
     public static var MAX_INT:Int64 = 2147483647.ofInt();
 
-
     public static macro function make() {
         var path = '${Sys.getCwd()}/.optimus'.normalize();
         if (!sys.FileSystem.exists(path)) {
