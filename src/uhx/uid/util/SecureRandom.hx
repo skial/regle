@@ -1,8 +1,9 @@
 package uhx.uid.util;
 
+import haxe.crypto.Sha256;
 import haxe.io.Bytes;
 
-// Taken from haxe-crypto
+// Originally taken from haxe-crypto
 // @see https://github.com/soywiz/haxe-crypto/blob/master/src/com/hurlant/crypto/prng/SecureRandom.hx
 class SecureRandom {
     public static inline function random(length:Int):Bytes {
@@ -26,8 +27,6 @@ class SecureRandom {
             var rng = new cs.system.security.cryptography.RNGCryptoServiceProvider();
             rng.GetBytes(out.getData());
             return out;
-        #elseif hl
-            #error "HashLink is not supported";
         #elseif sys
             // https://en.wikipedia.org/wiki//dev/random
             var out = Bytes.alloc(length);
@@ -35,6 +34,9 @@ class SecureRandom {
             input.readBytes(out, 0, length);
             input.close();
             return out;
+        #else
+            //#error "Target not supported.";
+            throw "Target is not supported.";
         #end
     }
 }

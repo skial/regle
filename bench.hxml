@@ -35,6 +35,6 @@
 
 -php bin/bench
 
-#--next
+--next
 
-#-hl bin/bench.hl
+-hl bin/bench.hl

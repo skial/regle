@@ -12,9 +12,10 @@ class NanoidSpec {
 
     public function testNanoid() {
         var b = new AssertionBuffer();
-        var id = new Nanoid().toString();
-        trace( id );
+        var nanoid = new Nanoid();
+        var id = nanoid.toString();
         b.assert( id.length == 22 );
+        b.assert( id  == nanoid.toString() );
         return b.done();
     }
 
@@ -33,12 +34,15 @@ class NanoidSpec {
         return b.done();
     }
 
+    //#if !hl
+    // HashLink stalls without error on this.
     public function testNanoid_customAlphabet() {
         return assert( Nanoid.generate('a', 5) == 'aaaaa' );
     }
+    //#end
 
     // @:see https://github.com/ai/nanoid/blob/master/test/generate.test.js
-    public function testNanoid_hashFlatDistribution() {
+    public function testNanoid_hasFlatDistribution() {
         var length = 5;
         var count = 100 * 1000;
         var chars = new Map<String,Int>();
@@ -57,7 +61,10 @@ class NanoidSpec {
 
         }
 
-        buffer.assert([for (k in chars.keys()) k].length == alphabet.length );
+        var keys = [for (k in chars.keys()) k];
+        trace( chars );
+        trace( keys.length, keys );
+        buffer.assert(keys.length == alphabet.length );
 
         var max:Float = 0;
         var min:Float = 9007199254740991; // This is gonna break! Meant to be max int.

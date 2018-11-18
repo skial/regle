@@ -43,13 +43,12 @@
 
 --next
 
--D php7
 -php bin/php
 
 #--next
 
 #--macro Main.main()
 
-#--next
+--next
 
-#-hl bin/regle.hl
+-hl bin/regle.hl
