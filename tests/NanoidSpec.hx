@@ -34,12 +34,9 @@ class NanoidSpec {
         return b.done();
     }
 
-    //#if !hl
-    // HashLink stalls without error on this.
     public function testNanoid_customAlphabet() {
         return assert( Nanoid.generate('a', 5) == 'aaaaa' );
     }
-    //#end
 
     // @:see https://github.com/ai/nanoid/blob/master/test/generate.test.js
     public function testNanoid_hasFlatDistribution() {

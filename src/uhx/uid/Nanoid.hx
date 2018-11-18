@@ -10,28 +10,22 @@ using haxe.io.Bytes;
 @:forward @:forwardStatics @:notNull enum abstract NanoIntConsts(Int) from Int to Int {
     var Size = 22;
     var Mask = 5;
-    var Len = 63;
 }
 
+/**
+@author Skial Bainn
+Port of the Golang Nano ID lib.
+**/
 @:structInt class Nanoid {
 
-    private var id:Bytes;
-    private var bytes:BytesData;
+    private var id:String;
 
     public inline function new(size:Int = Size) {
-        #if (hl || neko)
-        var _bytes = Bytes.alloc(size);
-        for (i in 0...size) _bytes.set(i, Std.int(Math.random() * Alphabet.length) );
-        var bytes = _bytes.getData();
-        #else
-        bytes = uhx.uid.util.SecureRandom.random(size).getData();
-        #end
-        id = Bytes.alloc(size);
-        for (i in 0...size) id.set( i, Alphabet.fastCodeAt(bytes.fastGet(i)&Len) );
+        id = generate(Alphabet, size);
     }
 
     public inline function toString():String {
-        return id.toString();
+        return id;
     }
 
     //
