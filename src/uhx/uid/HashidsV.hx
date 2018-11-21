@@ -8,14 +8,18 @@ using uhx.uid.HashidsV.ByteHelper;
 
 class HashidsV {
 
-    public var seps:Bytes = Bytes.ofString('cfhistuCFHISTU');
+    public static final Alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    public static final Separators = 'cfhistuCFHISTU';
+
+    public var seps:Bytes = Bytes.ofString(Separators);
     public var guards:Bytes;
     public var saltBytes:Bytes;
     public var alphabetBytes:Bytes;
     public var minHashLength:Int = 0;
 
-    public function new(salt:String = '', minHashLength:Int = 0, alphabet:String = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890') {
+    public function new(salt:String = '', minHashLength:Int = 0, ?alphabet:String) {
         if (minHashLength < 0) this.minHashLength = 0;
+        if (alphabet == null) alphabet = Alphabet;
 
         var diff = 0;
         var sepLength = 0;
@@ -35,42 +39,45 @@ class HashidsV {
 
         // `seps` should contain only characters present in `alphabet`.
         // `alphabet` should not contain `seps` characters.
+        var data = seps.getData();
         for (i in 0...seps.length) {
-            var idk = uniqueAlphabet.indexOf(seps.getData().fastGet(i));
+            var idk = uniqueAlphabet.indexOf(data.fastGet(i));
             if (idk == -1) {
                 seps.set(i, ' '.code);
-
             } else {
                 uniqueAlphabet.set(idk, ' '.code);
-
             }
 
         }
 
-        uniqueAlphabet = uniqueAlphabet.filterNulls();
-        seps = seps.filterNulls();
-        seps = consistentShuffle(seps, saltBytes);
-        var length = uniqueAlphabet.trueLength();
-        if (seps.length == 0 || (length / seps.length) > SepDiv) {
+        var r = uniqueAlphabet.filterNulls();
+        uniqueAlphabet = r.b;
+        var length = r.l;
+        r = seps.filterNulls();
+        seps = r.b;
+        var slength = r.l;
+        seps = consistentShuffle(seps, saltBytes, slength, saltBytes.length);
+        if (slength == 0 || (length / slength) > SepDiv) {
             sepLength = Math.ceil(length / SepDiv);
 
-            if (sepLength > seps.length) {
-                diff = sepLength - seps.length;
+            if (sepLength > slength) {
+                diff = sepLength - slength;
                 var sub = uniqueAlphabet.sub(0, diff);
                 seps = Bytes.ofString(seps.toString() + sub.toString());
                 uniqueAlphabet = sub;
+                length = sub.length;
 
             }
 
         }
-        uniqueAlphabet = consistentShuffle(uniqueAlphabet/*.resize(diff)*/, saltBytes);
-        length = uniqueAlphabet.trueLength();
+        uniqueAlphabet = consistentShuffle(uniqueAlphabet, saltBytes, length, saltBytes.length);
+        //length = uniqueAlphabet.trueLength();
 
         var guardCount = Math.ceil(length / GuardDiv );
 
         if (length < 3) {
             guards = seps.sub(0, guardCount);
-            seps = seps.sub(guardCount, seps.length-1);
+            seps = seps.sub(guardCount, slength-1);
 
         } else {
             guards = uniqueAlphabet.sub(0, guardCount);
@@ -113,8 +120,8 @@ class HashidsV {
         for (index in 0...numbers.length) {
             var number = numbers[index];
             var buffer = lottery + saltBytes.toString() + alphabetBytes.toString();
-            alphabetBytes = consistentShuffle(alphabetBytes, Bytes.ofString(buffer.substr(0, length)));
-            var last = toAlphabet(number, alphabetBytes);
+            alphabetBytes = consistentShuffle(alphabetBytes, Bytes.ofString(buffer.substr(0, length)), length, buffer.length);
+            var last = toAlphabet(number, alphabetBytes, length);
             
             result += last;
 
@@ -143,9 +150,9 @@ class HashidsV {
 
         }
 
-        var halfLength = (length = alphabetBytes.trueLength()) >> 1;
+        var halfLength = /*(length = alphabetBytes.trueLength())*/length >> 1;
         while (result.length < minHashLength) {
-            alphabetBytes = consistentShuffle(alphabetBytes, alphabetBytes);
+            alphabetBytes = consistentShuffle(alphabetBytes, alphabetBytes, length, length);
             result = alphabetBytes.sub(halfLength, length-1 - halfLength).toString() + result + alphabetBytes.sub(0, halfLength).toString();
 
             var excess = result.length - minHashLength;
@@ -159,11 +166,7 @@ class HashidsV {
     }
 
     public function decode(hash:String):Array<Int> {
-        var copy = Bytes.alloc(alphabetBytes.length);
-        for (i in 0...alphabetBytes.length) {
-            copy.set( i, alphabetBytes.getData().fastGet(i) );
-        }
-        return hash.length == 0 ? [] : _decode(hash, copy);
+        return hash.length == 0 ? [] : _decode(hash, alphabetBytes.copy());
     }
 
     public function _decode(hash:String, alphabet:Bytes):Array<Int> {
@@ -205,15 +208,15 @@ class HashidsV {
             parts.push( idBreakdown.sub(lastNormal, idBreakdown.length - lastNormal) );
         }
 
+        var aLength = alphabet.trueLength();
+
         for (i in 0...parts.length) {
             var subId = parts[i];
             var buffer = lottery + saltBytes.toString() + alphabet.toString();
-            alphabet = consistentShuffle(alphabet, Bytes.ofString(buffer.substr(0, alphabet.trueLength())));
-            var v = fromAlphabet(subId, alphabet);
+            alphabet = consistentShuffle(alphabet, Bytes.ofString(buffer.substr(0, aLength)), aLength, aLength);
+            var v = fromAlphabet(subId, alphabet, aLength);
             result.push( v );
         }
-
-        //alphabetBytes = alphabet;
 
         var check = _encode(result);
         if (check != hash) {
@@ -225,12 +228,12 @@ class HashidsV {
 
     //
 
-    //public static final MinLength = 16;
     public static final SepDiv = 3.5;
     public static final GuardDiv = 12;
 
-    public static function consistentShuffle(alphabet:Bytes, salt:Bytes):Bytes {
-        var saltLength = salt.trueLength();
+    public static function consistentShuffle(alphabet:Bytes, salt:Bytes, ?alphabetLength:Int, ?saltLength:Int):Bytes {
+        if (alphabetLength == null) alphabetLength = alphabet.trueLength();
+        if (saltLength == null) saltLength = salt.trueLength();
         if (saltLength == 0) return alphabet;
 
         var int = 0;
@@ -238,7 +241,7 @@ class HashidsV {
         var v = 0;
         var p = 0;
         var j = 0;
-        var i = alphabet.trueLength() - 1;
+        var i = alphabetLength - 1;
 
         while (i > 0) {
             v %= saltLength;
@@ -255,9 +258,9 @@ class HashidsV {
         return alphabet;
     }
 
-    public static function toAlphabet(input:Int, alphabet:Bytes):String {
+    public static function toAlphabet(input:Int, alphabet:Bytes, ?length:Int):String {
         var id = '';
-        var length = alphabet.trueLength();
+        if (length == null) length = alphabet.trueLength();
         
         do {
             id = String.fromCharCode( alphabet.getData().fastGet(input % length) ) + id;
@@ -268,9 +271,9 @@ class HashidsV {
         return id;
     }
 
-    public static function fromAlphabet(input:Bytes, alphabet:Bytes):Int {
+    public static function fromAlphabet(input:Bytes, alphabet:Bytes, ?length:Int):Int {
         var result = 0;
-        var length = alphabet.trueLength();
+        if (length == null) length = alphabet.trueLength();
 
         for (i in 0...input.length) {
             var index = alphabet.indexOf(input.getData().fastGet(i));
@@ -313,7 +316,7 @@ class ByteHelper {
         return result;
     }
 
-    public static function filterNulls(b:Bytes):Bytes {
+    public static function filterNulls(b:Bytes):{b:Bytes, l:Int} {
         var result = Bytes.alloc(b.length);
 
         var index = 0;
@@ -329,7 +332,7 @@ class ByteHelper {
 
         }
 
-        return result;
+        return {b:result, l:index};
     }
 
     public static function trueLength(b:Bytes):Int {
@@ -346,6 +349,14 @@ class ByteHelper {
         }
 
         return length;
+    }
+
+    public static inline function copy(b:Bytes):Bytes {
+        var result = Bytes.alloc(b.length);
+        var data = b.getData();
+        for (i in 0...b.length) result.set(i, data.fastGet(i));
+
+        return result;
     }
 
 }
