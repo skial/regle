@@ -8,8 +8,8 @@ class Main {
     public static function main() {
         Runner.run(TestBatch.make([
             new HashidsSpec(),
-            new OptimusSpec(),
-            new NanoidSpec(),
+            //new OptimusSpec(),
+            //new NanoidSpec(),
         ]));
     }
 

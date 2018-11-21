@@ -8,8 +8,8 @@ class Bench {
     public static function main() {
         Runner.run(TestBatch.make([
             new HashidsBench(),
-            new OptimusBench(),
-            new NanoidBench(),
+            //new OptimusBench(),
+            //new NanoidBench(),
         ]));
     }
 
