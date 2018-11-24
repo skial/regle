@@ -48,7 +48,7 @@ class HashidsBench implements Benchmark {
     }
 
     @:benchmark(10000) public function hashIds_Bytes_shuffle() @:privateAccess {
-        uhx.uid.HashidsV.consistentShuffle(Bytes.ofString(seps), Bytes.ofString(salt));
+        uhx.uid.HashidsV.consistentShuffle(Bytes.ofString(seps), Bytes.ofString(salt), seps.length, salt.length);
     }
 
     @:benchmark(10000) public function hashIds_Lib_toAlphabet() @:privateAccess {
@@ -60,7 +60,7 @@ class HashidsBench implements Benchmark {
     }
 
     @:benchmark(10000) public function hashIds_Bytes_toAlphabet() @:privateAccess {
-        uhx.uid.HashidsV.toAlphabet(97, Bytes.ofString('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'));
+        uhx.uid.HashidsV.toAlphabet(97, Bytes.ofString('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'), 62);
     }
 
 

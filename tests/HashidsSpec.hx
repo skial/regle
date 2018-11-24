@@ -36,7 +36,7 @@ import uhx.uid.HashidsV;
 		var s = Bytes.ofString('this is my salt');
 
 		b.assert( h.consistentShuffle('cfhistuCFHISTU', 'this is my salt') == u.consistentShuffle('cfhistuCFHISTU', 'this is my salt') );
-		b.assert( h.consistentShuffle('cfhistuCFHISTU', 'this is my salt') == HashidsV.consistentShuffle(a, s).toString() );
+		b.assert( h.consistentShuffle('cfhistuCFHISTU', 'this is my salt') == HashidsV.consistentShuffle(a, s, a.length, s.length).toString() );
 
 		return b.done();
 	}
@@ -48,7 +48,7 @@ import uhx.uid.HashidsV;
 		var a = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 
 		b.assert( h.hash(97, a) == u.hash(97, a) );
-		b.assert( HashidsV.toAlphabet(97, Bytes.ofString(a) ) == h.hash(97, a) );
+		b.assert( HashidsV.toAlphabet(97, Bytes.ofString(a), a.length ) == h.hash(97, a) );
 
 		return b.done();
 	}
