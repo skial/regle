@@ -8,9 +8,7 @@ import uhx.uid.HashidsV;
 
 @:asserts class HashidsSpec {
     
-    public function new() {
-        
-    }
+    public function new() {}
 
 	@:variant(new uhx.uid.Hashids())
     @:variant(new uhx.uid.Hashids.UhxHashids())
@@ -18,6 +16,7 @@ import uhx.uid.HashidsV;
 	public function test123_Basic(hashid:HashidLike) {
 		asserts.assert( 'o2fXhV' == hashid.encode([1, 2, 3]) );
 		asserts.assert( '' + [1, 2, 3] == '' + hashid.decode( 'o2fXhV' ) );
+		return asserts.done();
 	}
 
 	@:variant(new uhx.uid.Hashids('this is my salt', 8, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"))
@@ -26,6 +25,7 @@ import uhx.uid.HashidsV;
 	public function test123_Custom(hashid:HashidLike) {
 		asserts.assert( 'GlaHquq0' == hashid.encode([1, 2, 3]) );
 		asserts.assert( '' + [1, 2, 3] == '' + hashid.decode( 'GlaHquq0' ) );
+		return asserts.done();
 	}
 
 	public function testConsistentShuffle() @:privateAccess {
@@ -36,6 +36,7 @@ import uhx.uid.HashidsV;
 
 		asserts.assert( h.consistentShuffle('cfhistuCFHISTU', 'this is my salt') == u.consistentShuffle('cfhistuCFHISTU', 'this is my salt') );
 		asserts.assert( h.consistentShuffle('cfhistuCFHISTU', 'this is my salt') == HashidsV.consistentShuffle(a, s, a.length, s.length).toString() );
+		return asserts.done();
 	}
 
 	public function testHash() @:privateAccess {
@@ -45,6 +46,7 @@ import uhx.uid.HashidsV;
 
 		asserts.assert( h.hash(97, a) == u.hash(97, a) );
 		asserts.assert( HashidsV.toAlphabet(97, Bytes.ofString(a), a.length ) == h.hash(97, a) );
+		return asserts.done();
 	}
 
 	public function testHashids_encodeBytes() @:privateAccess {
@@ -60,6 +62,7 @@ import uhx.uid.HashidsV;
 		asserts.assert( 'o2fXhV' == h.encode([1, 2, 3]) );
 		asserts.assert( 'o2fXhV' == u.encode([1, 2, 3]) );
 		asserts.assert( 'o2fXhV' == y.encode([1, 2, 3]) );
+		return asserts.done();
 	}
 
 	public function testHashids_decodeBytes() @:privateAccess {
@@ -70,6 +73,7 @@ import uhx.uid.HashidsV;
 		asserts.assert( '' + h.decode('o2fXhV') == '' + [1, 2, 3] );
 		asserts.assert( '' + u.decode('o2fXhV') == '' + [1, 2, 3] );
 		asserts.assert( '' + y.decode('o2fXhV') == '' + [1, 2, 3] );
+		return asserts.done();
 	}
 
 }

@@ -7,9 +7,9 @@ class Main {
 
     public static function main() {
         Runner.run(TestBatch.make([
-            //new HashidsSpec(),
-            /*new OptimusSpec(),
-            new NanoidSpec(),*/
+            new HashidsSpec(),
+            new OptimusSpec(),
+            new NanoidSpec(),
             new hashids.TestSpec(),
         ]));
     }

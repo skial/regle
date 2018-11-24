@@ -3,10 +3,12 @@ package uhx.uid;
 import yaml.util.Ints;
 
 typedef Hashids =
-#if !uhx_hashids
-	hashids.Hashids
-#else
+#if uhx_hashids
 	uhx.uid.Hashids.UhxHashids
+#elseif hashids_bytes
+	uhx.uid.HashidsV
+#else
+	hashids.Hashids
 #end
 ;
 /**

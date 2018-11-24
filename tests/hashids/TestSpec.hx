@@ -15,7 +15,7 @@ import tink.unit.Assert.*;
 		var num_to_hash = 900719925;
 		var res = a.encode([num_to_hash]);
 		var b = a.decode(res);
-		assert(num_to_hash == b[0]);
+		return assert(num_to_hash == b[0]);
 	}
 	
     @:variant(new uhx.uid.Hashids('this is my pepper'))
@@ -23,7 +23,7 @@ import tink.unit.Assert.*;
     @:variant(new uhx.uid.HashidsV('this is my pepper'))
 	public function testWrongDecoding(a:HashidLike) {
 		var b = a.decode('NkK9');
-		assert(0 == b.length);
+		return assert(0 == b.length);
 	}
 
     @:variant(new uhx.uid.Hashids('this is my salt'))
@@ -39,6 +39,7 @@ import tink.unit.Assert.*;
 		var res2 = a.decode(expected);
 		asserts.assert(1 == res2.length);
 		asserts.assert(num_to_hash == res2[0]);
+		return asserts.done();
 	}
 
     @:variant(new uhx.uid.Hashids('this is my salt'))
@@ -55,6 +56,7 @@ import tink.unit.Assert.*;
 		asserts.assert(num_to_hash.length == res2.length);
 		for(i in 0...res.length)
 			asserts.assert(num_to_hash[i] == res2[i]);
+		return asserts.done();
 	}
 
     @:variant(new uhx.uid.Hashids('this is my salt', 0, '0123456789abcdef'))
@@ -69,6 +71,7 @@ import tink.unit.Assert.*;
 		
 		var res2 = a.decode(expected);
 		asserts.assert(num_to_hash[0] == res2[0]);
+		return asserts.done();
 	}
 
     @:variant(new uhx.uid.Hashids('this is my salt', 8))
@@ -84,6 +87,7 @@ import tink.unit.Assert.*;
 		var res2 = a.decode(expected);
 		asserts.assert(1 == res2.length);
 		asserts.assert(num_to_hash[0] == res2[0]);
+		return asserts.done();
 	}
 
     @:variant(new uhx.uid.Hashids('this is my salt'))
@@ -100,6 +104,7 @@ import tink.unit.Assert.*;
 		asserts.assert(num_to_hash.length == res2.length);
 		for(i in 0...res.length)
 			asserts.assert(num_to_hash[i] == res2[i]);
+		return asserts.done();
 	}
 
     @:variant(new uhx.uid.Hashids('this is my salt'))
@@ -116,6 +121,7 @@ import tink.unit.Assert.*;
 		asserts.assert(res2.length == num_to_hash.length);
 		for(i in 0...res.length)
 			asserts.assert(num_to_hash[i] == res2[i]);
+		return asserts.done();
 	}
 
     @:variant(new uhx.uid.Hashids('this is my salt'))
@@ -127,6 +133,7 @@ import tink.unit.Assert.*;
 		asserts.assert('yD' == a.encode([3]));
 		asserts.assert('2l' == a.encode([4]));
 		asserts.assert('rD' == a.encode([5]));
+		return asserts.done();
 	}
 
     @:variant(new uhx.uid.Hashids('MyCamelCaseSalt', 10, 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789'))
@@ -141,5 +148,6 @@ import tink.unit.Assert.*;
 		
 		var res2:Array<Int> = a.decode(expected);
 		asserts.assert(num_to_hash[0] == res2[0]);
+		return asserts.done();
 	}
 }
