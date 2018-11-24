@@ -18,7 +18,6 @@ typedef HashidLike = {
     @:variant(new uhx.uid.HashidsV('this is my salt'))
 	function testBasic(a:HashidLike) {
 		var num_to_hash = 900719925;
-		//var	a:HashidLike = cast new T('this is my salt');
 		var res = a.encode([num_to_hash]);
 		var b = a.decode(res);
 		return assert(num_to_hash == b[0]);
@@ -28,7 +27,6 @@ typedef HashidLike = {
     @:variant(new uhx.uid.Hashids.UhxHashids('this is my pepper'))
     @:variant(new uhx.uid.HashidsV('this is my pepper'))
 	function testWrongDecoding(a:HashidLike) {
-		//var a:HashidLike = cast new T('this is my pepper');
 		var b = a.decode('NkK9');
 		return assert(0 == b.length);
 	}
@@ -39,7 +37,6 @@ typedef HashidLike = {
 	function testOneNumber(a:HashidLike) {
 		var expected = 'NkK9';
 		var num_to_hash = 12345;
-		//var a:HashidLike = cast new T('this is my salt');
         var b = new AssertionBuffer();
 		
 		var res = a.encode([num_to_hash]);
@@ -48,7 +45,6 @@ typedef HashidLike = {
 		var res2 = a.decode(expected);
 		b.assert(1 == res2.length);
 		b.assert(num_to_hash == res2[0]);
-		//b.assert(num_to_hash == res2); // test the abstract cast
         return b.done();
 	}
 
@@ -58,7 +54,6 @@ typedef HashidLike = {
 	function testServeralNumbers(a:HashidLike) {
 		var expected = 'aBMswoO2UB3Sj';
 		var num_to_hash = [683, 94108, 123, 5];
-		//var a:HashidLike = cast new T('this is my salt');
         var b = new AssertionBuffer();
 		
 		var res = a.encode(num_to_hash);
@@ -78,7 +73,6 @@ typedef HashidLike = {
 	function testSpecifyingCustomHashAlphabet(a:HashidLike) {
 		var expected = 'b332db5';
 		var num_to_hash = [1234567];
-		//var a:HashidLike = cast new T('this is my salt', 0, '0123456789abcdef');
         var b = new AssertionBuffer();
 		
 		var res = a.encode(num_to_hash);
@@ -86,7 +80,6 @@ typedef HashidLike = {
 		
 		var res2 = a.decode(expected);
 		b.assert(num_to_hash[0] == res2[0]);
-		//b.assert(num_to_hash == res2); // test the abstract cast
 
         return b.done();
 	}
@@ -97,7 +90,6 @@ typedef HashidLike = {
 	function testSpecifyingCustomHashLength(a:HashidLike) {
 		var expected = 'gB0NV05e';
 		var num_to_hash = [1];
-		//var a:HashidLike = cast new T('this is my salt', 8);
         var b = new AssertionBuffer();
 		
 		var res = a.encode(num_to_hash);
@@ -106,7 +98,6 @@ typedef HashidLike = {
 		var res2 = a.decode(expected);
 		b.assert(1 == res2.length);
 		b.assert(num_to_hash[0] == res2[0]);
-		//b.assert(num_to_hash == res2); // test the abstract cast
 
         return b.done();
 	}
@@ -117,7 +108,6 @@ typedef HashidLike = {
 	function testRandomness(a:HashidLike) {
 		var expected = '1Wc8cwcE', res;
 		var num_to_hash = [5, 5, 5, 5];
-		//var a:HashidLike = cast new T('this is my salt');
         var b = new AssertionBuffer();
 		
 		var res = a.encode(num_to_hash);
@@ -137,7 +127,6 @@ typedef HashidLike = {
 	function testRandomnessForIncrementingNumbers(a:HashidLike) {
 		var expected = 'kRHnurhptKcjIDTWC3sx';
 		var num_to_hash = [1,2,3,4,5,6,7,8,9,10];
-		//var a:HashidLike = cast new T('this is my salt');
         var b = new AssertionBuffer();
 		
 		var res = a.encode(num_to_hash);
@@ -155,7 +144,6 @@ typedef HashidLike = {
     @:variant(new uhx.uid.Hashids.UhxHashids('this is my salt'))
     @:variant(new uhx.uid.HashidsV('this is my salt'))
 	function testRandomnessForIncrementing(a:HashidLike) {
-		//var a:HashidLike = cast new T('this is my salt');
         var b = new AssertionBuffer();
 
 		b.assert('NV' == a.encode([1]));
@@ -173,7 +161,6 @@ typedef HashidLike = {
 	function testAlphabetWithoutO0(a:HashidLike) {
 		var expected = '9Q7MJ3LVGW';
 		var num_to_hash = [1145];
-		//var a:HashidLike = cast new T('MyCamelCaseSalt', 10, 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789');
         var b = new AssertionBuffer();
 		
 		var res = a.encode(num_to_hash);
@@ -181,7 +168,6 @@ typedef HashidLike = {
 		
 		var res2:Array<Int> = a.decode(expected);
 		b.assert(num_to_hash[0] == res2[0]);
-		//b.assert(num_to_hash == res2); // test the abstract cast
 
         return b.done();
 	}
