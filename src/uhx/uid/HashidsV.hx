@@ -6,6 +6,11 @@ using StringTools;
 using haxe.io.Bytes;
 using uhx.uid.HashidsV.ByteHelper;
 
+@:callable abstract Errors(String->String) {
+    public static var SmallAlphabet = s -> 'error: alphabet must contain at least $s unique characters';
+    public static var SpaceAlphabet = s -> 'error: alphabet cannot contain spaces';
+}
+
 class HashidsV {
 
     public static final Alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
@@ -32,8 +37,13 @@ class HashidsV {
         var index = 0;
         for (i in 0...alphabet.length) {
             code = alphabet.fastCodeAt(i);
-            if (code == ' '.code && uniqueAlphabet.indexOf( code ) != -1) continue;
+            if (code == ' '.code) throw Errors.SpaceAlphabet('');
+            if (uniqueAlphabet.indexOf( code ) != -1) continue;
             uniqueAlphabet.set(index++, code);
+        }
+
+        if (uniqueAlphabet.trueLength() < MinLength) {
+            throw Errors.SmallAlphabet('$MinLength');
         }
 
         // `seps` should contain only characters present in `alphabet`.
@@ -54,7 +64,6 @@ class HashidsV {
         var r = uniqueAlphabet.filterNulls();
         uniqueAlphabet = r.b;
         var length = r.l;
-
         r = seps.filterNulls();
         seps = r.b;
         var slength = r.l;
@@ -65,7 +74,7 @@ class HashidsV {
 
             if (sepLength > slength) {
                 diff = sepLength - slength;
-                seps = Bytes.ofString(seps.toString() + uniqueAlphabet.sub(0, diff).toString());
+                seps = Bytes.ofString(seps.sub(0, slength).toString() + uniqueAlphabet.sub(0, diff).toString());
                 uniqueAlphabet = uniqueAlphabet.sub(diff, length-diff);
                 length = length-diff;
 
@@ -117,6 +126,7 @@ class HashidsV {
 
         var alphabetBytes = alphabetBytes.copy();
         var length = alphabetBytes.trueLength();
+        
         var code = alphabetBytes.getData().fastGet(idInt % length);
 
         result = String.fromCharCode( code );
@@ -125,7 +135,7 @@ class HashidsV {
 
         for (index in 0...numbers.length) {
             var number = numbers[index];
-            var buffer = lottery + saltBytes.toString() + alphabetBytes.toString();
+            var buffer = lottery + saltBytes.toString() + alphabetBytes.sub(0, length).toString();
 
             alphabetBytes = consistentShuffle(alphabetBytes, Bytes.ofString(buffer.substr(0, length)), length, buffer.length);
 
@@ -245,6 +255,7 @@ class HashidsV {
 
     //
 
+    public static final MinLength = 16;
     public static final SepDiv = 3.5;
     public static final GuardDiv = 12;
 
@@ -332,7 +343,6 @@ class ByteHelper {
 
     public static function filterNulls(b:Bytes):{b:Bytes, l:Int} {
         var result = Bytes.alloc(b.length);
-
         var index = 0;
         var value = -1;
         for (i in 0...b.length) {
