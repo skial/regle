@@ -1,4 +1,3 @@
--lib yaml
 -lib random
 -lib tink_core
 -lib tink_unittest

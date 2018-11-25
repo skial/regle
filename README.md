@@ -10,6 +10,7 @@ Regle currently contains:
 	
 - An [Hashids] port that generates short, unique, non-sequential ids from numbers.
 	+ To access the original `uhx.uid` Hashids implementation add `-D uhx_hashids`. The lib `hashids` by @kevinresol has better expanded tests.
+	+ A bytes based implementation, which should be faster, is available via `-D hashids_bytes`. Compile `bench.hxml` and run one of the target outputs to see the speed differences.
 - An [Optimus] port that obfuscates ids based on Knuth's multiplicative hashing method.
 - An [Nano ID] port that is a tiny, _platform dependant_ secure, URL friendly, unique string ID generator.
 	+ The [HashLink](https://github.com/HaxeFoundation/hashlink/blob/master/src/std/random.c) & Neko targets uses `Math.random`. They pass the flat distribution test, but wont be classed as secure.

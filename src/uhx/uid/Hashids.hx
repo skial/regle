@@ -1,12 +1,12 @@
 package uhx.uid;
 
-import yaml.util.Ints;
-
 typedef Hashids =
-#if !uhx_hashids
-	hashids.Hashids
-#else
+#if uhx_hashids
 	uhx.uid.Hashids.UhxHashids
+#elseif hashids_bytes
+	uhx.uid.HashidsV
+#else
+	hashids.Hashids
 #end
 ;
 /**
@@ -39,7 +39,7 @@ class UhxHashids {
 		}
 		
 		this.alphabet = uniqueAlphabet;
-		this.minHashLength = Ints.parseInt('' + minHashLength, 10) > 0 ? minHashLength : 0;
+		this.minHashLength = minHashLength > 0 ? minHashLength : 0;
 		
 		if (this.alphabet.length < this.minAlphabetLength) {
 			throw 'error: alphabet must contain at least $minAlphabetLength unique characters';
@@ -60,11 +60,12 @@ class UhxHashids {
 			
 		}
 		
-		this.alphabet = ~/ /g.replace(this.alphabet, '');
-		separators = ~/ /g.replace( separators, '' );
+		var reg = ~/ /g;
+		this.alphabet = reg.replace(this.alphabet, '');
+		separators = reg.replace(separators, '');
 		separators = consistentShuffle( separators, this.salt );
 		
-		if (separators.length > 0 || (this.alphabet.length / separators.length) > separatorDiv) {
+		if (separators == '' || (alphabet.length / separators.length) > separatorDiv) {
 			sepLength = Math.ceil(this.alphabet.length / separatorDiv);
 			
 			if (sepLength == 1) sepLength++;
@@ -150,6 +151,7 @@ class UhxHashids {
 		for (i in 0...numbers.length) {
 			var number = numbers[i];
 			var buffer = '$lottery$salt$alphabet';
+			
 			alphabet = consistentShuffle( alphabet, buffer.substr(0, alphabet.length ) );
 			var last = this.hash(number, alphabet);
 			
@@ -176,7 +178,7 @@ class UhxHashids {
 			}
 		}
 		
-		var halfLength = Ints.parseInt('' + (alphabet.length / 2), 10);
+		var halfLength = alphabet.length >> 1;
 		
 		while (result.length < minHashLength) {
 			alphabet = consistentShuffle( alphabet, alphabet );
@@ -185,7 +187,7 @@ class UhxHashids {
 			var excess = result.length - minHashLength;
 			
 			if (excess > 0) {
-				result = result.substr(Std.int(excess / 2), minHashLength);
+				result = result.substr(excess >> 1, minHashLength);
 			}
 			
 		}
@@ -207,7 +209,7 @@ class UhxHashids {
 			
 			r = new EReg('[$separators]', 'g');
 			hashBreakdown = r.replace(hashBreakdown, ' ');
-			hashArray = hashBreakdown.split(' ' );
+			hashArray = hashBreakdown.split(' ');
 			
 			for (i in 0...hashArray.length) {
 				var subhash = hashArray[i];
@@ -227,11 +229,11 @@ class UhxHashids {
 	private function hash(input:Int, alphabet:String):String {
 		var hash = '';
 		
-		while (input > 0) {
+		do {
 			hash = alphabet.charAt(input % alphabet.length) + hash;
-			input = Ints.parseInt('' + input / alphabet.length, 10);
-		}
-		
+			input = Math.floor(input / alphabet.length);
+		} while (input > 0);
+
 		return hash;
 	}
 	

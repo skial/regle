@@ -10,6 +10,7 @@ class Main {
             new HashidsSpec(),
             new OptimusSpec(),
             new NanoidSpec(),
+            new hashids.TestSpec(),
         ]));
     }
 
