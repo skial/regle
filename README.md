@@ -9,19 +9,15 @@ Regle is a collection of utilities that generate ids.
 Regle currently contains:
 	
 - An [Hashids] port that generates short, unique, non-sequential ids from numbers.
-	+ To access the original `uhx.uid` Hashids implementation add `-D uhx_hashids`. The lib `hashids` by @kevinresol has better expanded tests.
-	+ A bytes based implementation, which should be faster, is available via `-D hashids_bytes`. Compile `bench.hxml` and run one of the target outputs to see the speed differences.
 - An [Optimus] port that obfuscates ids based on Knuth's multiplicative hashing method.
 - An [Nano ID] port that is a tiny, _platform dependant_ secure, URL friendly, unique string ID generator.
-	+ The [HashLink](https://github.com/HaxeFoundation/hashlink/blob/master/src/std/random.c) & Neko targets uses `Math.random`. They pass the flat distribution test, but wont be classed as secure.
 
 ## Installation
 
 You need to install the following libraries from HaxeLib and GitHub.
 
-1. yaml - `haxelib install yaml`
-2. hashids - `haxelib git hashids https://github.com/kevinresol/hashids master src`
-3. regle - `haxelib git regle https://github.com/skial/regle master src`
+1. hashids - `haxelib git hashids https://github.com/kevinresol/hashids master src`
+2. regle - `haxelib git regle https://github.com/skial/regle master src`
 
 Then in your `.hxml` file, add `-lib regle` and you're set.
 
@@ -42,6 +38,11 @@ class Main {
 	
 }
 ```
+
+##### Notes
+
++ To access the original `uhx.uid` Hashids implementation add `-D uhx_hashids`. The lib `hashids` by @kevinresol has better expanded tests.
++ A bytes based implementation, which should be faster, is available via `-D hashids_bytes`. Compile `bench.hxml` and run one of the target outputs to see the speed differences.
 
 ## Optimus Usage 
 
@@ -81,6 +82,10 @@ class Main {
 
 }
 ```
+
+##### Notes
+
++ The [HashLink](https://github.com/HaxeFoundation/hashlink/blob/master/src/std/random.c) & Neko targets uses `Math.random`. They pass the flat distribution test, but wont be classed as secure.
 
 [Hashids]: http://hashids.org/ "Generate short, unique, non-sequential ids"
 [Optimus]: https://github.com/jenssegers/optimus "Id obfuscation based on Knuth's multiplicative hashing method"

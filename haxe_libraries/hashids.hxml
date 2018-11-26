@@ -1,3 +1,3 @@
 -D hashids=1.0.0
-# @install: lix --silent download "gh://github.com/kevinresol/hashids#f9dfd8146301503220fc2cf56b4e13c160fd4a18" into hashids/1.0.0/github/f9dfd8146301503220fc2cf56b4e13c160fd4a18
--cp ${HAXE_LIBCACHE}/hashids/1.0.0/github/f9dfd8146301503220fc2cf56b4e13c160fd4a18/src
+# @install: lix --silent download "gh://github.com/kevinresol/hashids#fe762d8bf9fe3430736fb0b877a150d3f18289d8" into hashids/1.0.0/github/fe762d8bf9fe3430736fb0b877a150d3f18289d8
+-cp ${HAXE_LIBCACHE}/hashids/1.0.0/github/fe762d8bf9fe3430736fb0b877a150d3f18289d8/src
