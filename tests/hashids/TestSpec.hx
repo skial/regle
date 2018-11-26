@@ -288,7 +288,7 @@ import tink.unit.Assert.*;
 	@:variant(new uhx.uid.Hashids(), [], '')
     @:variant(new uhx.uid.Hashids.UhxHashids(), [], '')
     @:variant(new uhx.uid.HashidsV(), [], '')
-	//@:variant(new uhx.uid.Hashids(), [-1], '')
+	@:variant(new uhx.uid.Hashids(), [-1], '')
 	@:variant(new uhx.uid.Hashids.UhxHashids(), [-1], '')
 	@:variant(new uhx.uid.HashidsV(), [-1], '')
 	public function testBadInput_encode_jsRepo1(hash:HashidLike, values:Array<Int>, expected:String) {
