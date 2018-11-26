@@ -1,12 +1,12 @@
 package uhx.uid;
 
 typedef Hashids =
-#if uhx_hashids
-	uhx.uid.Hashids.UhxHashids
+#if hashids
+	hashids.Hashids
 #elseif hashids_bytes
 	uhx.uid.HashidsV
 #else
-	hashids.Hashids
+	uhx.uid.Hashids.UhxHashids
 #end
 ;
 /**

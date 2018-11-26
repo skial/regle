@@ -16,8 +16,9 @@ Regle currently contains:
 
 You need to install the following libraries from HaxeLib and GitHub.
 
-1. hashids - `haxelib git hashids https://github.com/kevinresol/hashids master src`
-2. regle - `haxelib git regle https://github.com/skial/regle master src`
+1. regle - `haxelib git regle https://github.com/skial/regle master src`
+2. hashids - `haxelib git hashids https://github.com/kevinresol/hashids master src`
+	+ This is optional, but it is more widely used.
 
 Then in your `.hxml` file, add `-lib regle` and you're set.
 
@@ -41,7 +42,7 @@ class Main {
 
 ##### Notes
 
-+ To access the original `uhx.uid` Hashids implementation add `-D uhx_hashids`. The lib `hashids` by @kevinresol has better expanded tests.
++ If you already have the `hashids` library included, `uhx.uid.Hashids` points to that instead of the one included.
 + A bytes based implementation, which should be faster, is available via `-D hashids_bytes`. Compile `bench.hxml` and run one of the target outputs to see the speed differences.
 
 ## Optimus Usage 
